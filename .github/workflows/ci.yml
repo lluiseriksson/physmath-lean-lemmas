@@ -1,0 +1,24 @@
+name: ci
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Source-level sorry gate
+        run: |
+          ! grep -rnE "sorry|admit|native_decide" --include="*.lean" PhysmathLemmas PhysmathLemmas.lean
+      - name: Install elan
+        run: |
+          curl -sSf https://elan.lean-lang.org/elan-init.sh | sh -s -- -y --default-toolchain none
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+      - name: Get Mathlib cache
+        run: lake exe cache get
+      - name: Build (0 errors, 0 sorry)
+        run: lake build
+      - name: Axiom audit (propext / Classical.choice / Quot.sound only)
+        run: ./scripts/check_axioms.sh

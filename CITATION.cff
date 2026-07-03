@@ -1,0 +1,17 @@
+cff-version: 1.2.0
+title: "physmath-lean-lemmas: machine-checked general lemmas of the physmath programme (three-infinities rooted closure)"
+message: "If you use this software, please cite it as below."
+type: software
+authors:
+  - family-names: Eriksson
+    given-names: Lluis
+version: 0.1.0
+date-released: 2026-07-03
+license: Apache-2.0
+keywords:
+  - Lean 4
+  - Mathlib
+  - cluster expansion
+  - Tonelli
+  - geometric series
+  - renormalization group bookkeeping
