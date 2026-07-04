@@ -171,6 +171,7 @@ Before vendoring a changed copy into the mother repo, rerun:
 lake exe cache get
 lake build
 ./scripts/check_axioms.sh
+python3 scripts/check_axioms.py
 python3 scripts/check_interface_contract.py
 python3 scripts/check_forbidden_tokens.py
 ```
