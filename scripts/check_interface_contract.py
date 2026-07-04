@@ -93,6 +93,10 @@ def lean_module_name(path: Path) -> str:
     return ".".join(rel.parts)
 
 
+def source_imports(source_text: str) -> list[str]:
+    return re.findall(r"(?m)^\s*import\s+([A-Za-z0-9_'.]+)\s*$", source_text)
+
+
 def main() -> None:
     contract = load_json(CONTRACT_PATH)
     if not isinstance(contract, dict):
@@ -124,6 +128,14 @@ def main() -> None:
     if not re.search(rf"(?m)^\s*namespace\s+{re.escape(namespace)}\s*$", source_text):
         fail(f"source file is missing namespace {namespace!r}")
 
+    declared_imports = expect_string_list(contract, "source_imports")
+    actual_imports = source_imports(source_text)
+    if declared_imports != actual_imports:
+        fail(
+            "source_imports drift: "
+            f"contract={declared_imports}, source={actual_imports}"
+        )
+
     toolchain = read_text(ROOT / "lean-toolchain").strip()
     if expect_string(contract, "lean_toolchain") != toolchain:
         fail(f"lean_toolchain does not match lean-toolchain ({toolchain})")
@@ -148,6 +160,9 @@ def main() -> None:
     expect_digest_anchor(digest, "namespace", f"namespace {namespace}")
     expect_digest_anchor(digest, "interface contract path", "docs/interface-contract.json")
     expect_digest_anchor(digest, "source file sha256", source_hash)
+    expect_digest_anchor(digest, "source imports field", "source_imports")
+    for source_import in declared_imports:
+        expect_digest_anchor(digest, f"source import {source_import}", source_import)
     expect_digest_anchor(digest, "Lean toolchain", toolchain)
     expect_digest_anchor(digest, "Mathlib rev", mathlib_rev)
 
