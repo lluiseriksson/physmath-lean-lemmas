@@ -12,6 +12,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 CONTRACT_PATH = ROOT / "docs" / "interface-contract.json"
+DIGEST_PATH = ROOT / "docs" / "mother-interface-digest.md"
 
 
 def fail(message: str) -> None:
@@ -64,6 +65,11 @@ def lakefile_mathlib_rev() -> str:
     return match.group(1)
 
 
+def expect_digest_anchor(digest: str, label: str, needle: str) -> None:
+    if needle not in digest:
+        fail(f"mother-interface-digest.md is missing {label}: {needle}")
+
+
 def main() -> None:
     contract = load_json(CONTRACT_PATH)
     if not isinstance(contract, dict):
@@ -93,6 +99,13 @@ def main() -> None:
             "mathlib_rev drift: "
             f"contract={mathlib_rev}, manifest={manifest_rev}, lakefile={lake_rev}"
         )
+
+    digest = read_text(DIGEST_PATH)
+    expect_digest_anchor(digest, "source file", expect_string(contract, "source_file"))
+    expect_digest_anchor(digest, "interface contract path", "docs/interface-contract.json")
+    expect_digest_anchor(digest, "source file sha256", source_hash)
+    expect_digest_anchor(digest, "Lean toolchain", toolchain)
+    expect_digest_anchor(digest, "Mathlib rev", mathlib_rev)
 
     declarations = contract.get("public_declarations")
     if not isinstance(declarations, list) or not declarations:
