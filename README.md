@@ -79,6 +79,10 @@ file `PhysmathLemmas/ThreeInfinities.lean` (Apache-2.0, self-contained
 over Mathlib) into the core and cite this satellite as origin — one
 audited copy, no external dependency in the trust chain.
 
+For the exact current consumer interface, including theorem signatures,
+required hypotheses and verification anchors, see
+[`docs/mother-interface-digest.md`](docs/mother-interface-digest.md).
+
 ## Mathlib?
 
 Evaluated in [MATHLIB.md](MATHLIB.md). Short version: **not a Mathlib
