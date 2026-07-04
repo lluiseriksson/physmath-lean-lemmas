@@ -52,6 +52,13 @@ def expect_string_list(mapping: dict[str, object], key: str) -> list[str]:
     return value
 
 
+def expect_object(mapping: dict[str, object], key: str) -> dict[str, object]:
+    value = mapping.get(key)
+    if not isinstance(value, dict):
+        fail(f"contract field {key!r} must be an object")
+    return value
+
+
 def mathlib_input_rev() -> str:
     manifest = load_json(ROOT / "lake-manifest.json")
     if not isinstance(manifest, dict):
@@ -113,6 +120,10 @@ def main() -> None:
             f"{source_module!r}"
         )
 
+    namespace = expect_string(contract, "namespace")
+    if not re.search(rf"(?m)^\s*namespace\s+{re.escape(namespace)}\s*$", source_text):
+        fail(f"source file is missing namespace {namespace!r}")
+
     toolchain = read_text(ROOT / "lean-toolchain").strip()
     if expect_string(contract, "lean_toolchain") != toolchain:
         fail(f"lean_toolchain does not match lean-toolchain ({toolchain})")
@@ -127,12 +138,20 @@ def main() -> None:
         )
 
     digest = read_text(DIGEST_PATH)
+    expect_digest_anchor(digest, "repository", expect_string(contract, "repository"))
     expect_digest_anchor(digest, "source file", expect_string(contract, "source_file"))
     expect_digest_anchor(digest, "top-level import", f"import {import_module}")
+    expect_digest_anchor(digest, "namespace", f"namespace {namespace}")
     expect_digest_anchor(digest, "interface contract path", "docs/interface-contract.json")
     expect_digest_anchor(digest, "source file sha256", source_hash)
     expect_digest_anchor(digest, "Lean toolchain", toolchain)
     expect_digest_anchor(digest, "Mathlib rev", mathlib_rev)
+
+    verification = expect_object(contract, "verification")
+    for command in expect_string_list(verification, "commands"):
+        expect_digest_anchor(digest, f"verification command {command}", command)
+    for axiom in expect_string_list(verification, "allowed_axioms"):
+        expect_digest_anchor(digest, f"allowed axiom {axiom}", axiom)
 
     declarations = contract.get("public_declarations")
     if not isinstance(declarations, list) or not declarations:
