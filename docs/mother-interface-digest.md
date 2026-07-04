@@ -171,7 +171,7 @@ lake exe cache get
 lake build
 ./scripts/check_axioms.sh
 python3 scripts/check_interface_contract.py
-! grep -rnE 'sorry|admit|native_decide' --include='*.lean' PhysmathLemmas PhysmathLemmas.lean
+python3 scripts/check_forbidden_tokens.py
 ```
 
 Expected public axiom set for the six exported theorems:

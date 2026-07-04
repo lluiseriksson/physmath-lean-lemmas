@@ -113,7 +113,7 @@
     "commands": [
       "lake build",
       "./scripts/check_axioms.sh",
-      "! grep -rnE 'sorry|admit|native_decide' --include='*.lean' PhysmathLemmas PhysmathLemmas.lean"
+      "python3 scripts/check_forbidden_tokens.py"
     ],
     "allowed_axioms": [
       "propext",
