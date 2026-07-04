@@ -12,7 +12,6 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 CONTRACT_PATH = ROOT / "docs" / "interface-contract.json"
-ALLOWED_AXIOMS = {"propext", "Classical.choice", "Quot.sound"}
 
 
 def fail(message: str) -> None:
@@ -20,13 +19,19 @@ def fail(message: str) -> None:
     raise SystemExit(1)
 
 
-def load_public_declarations() -> list[str]:
+def load_contract() -> dict[str, object]:
     try:
         contract = json.loads(CONTRACT_PATH.read_text(encoding="utf-8"))
     except FileNotFoundError:
         fail(f"missing required file: {CONTRACT_PATH.relative_to(ROOT)}")
     except json.JSONDecodeError as err:
         fail(f"{CONTRACT_PATH.relative_to(ROOT)} is not valid JSON: {err}")
+    if not isinstance(contract, dict):
+        fail(f"{CONTRACT_PATH.relative_to(ROOT)} root must be an object")
+    return contract
+
+
+def load_public_declarations(contract: dict[str, object]) -> list[str]:
 
     declarations = contract.get("public_declarations")
     if not isinstance(declarations, list) or not declarations:
@@ -41,6 +46,20 @@ def load_public_declarations() -> list[str]:
             fail("each public declaration needs a nonempty name")
         names.append(name)
     return names
+
+
+def load_allowed_axioms(contract: dict[str, object]) -> set[str]:
+    verification = contract.get("verification")
+    if not isinstance(verification, dict):
+        fail("verification must be an object")
+    allowed = verification.get("allowed_axioms")
+    if (
+        not isinstance(allowed, list)
+        or not allowed
+        or not all(isinstance(item, str) and item for item in allowed)
+    ):
+        fail("verification.allowed_axioms must be a nonempty list of strings")
+    return set(allowed)
 
 
 def lean_axiom_query(names: list[str]) -> str:
@@ -82,7 +101,9 @@ def parse_axioms(stdout: str, names: list[str]) -> dict[str, set[str]]:
 
 
 def main() -> None:
-    names = load_public_declarations()
+    contract = load_contract()
+    names = load_public_declarations(contract)
+    allowed_axioms = load_allowed_axioms(contract)
     query = lean_axiom_query(names)
     result = subprocess.run(
         ["lake", "env", "lean", "--stdin"],
@@ -103,14 +124,14 @@ def main() -> None:
     observed = parse_axioms(result.stdout, names)
     unexpected: list[str] = []
     for full_name, axioms in observed.items():
-        extra = axioms - ALLOWED_AXIOMS
+        extra = axioms - allowed_axioms
         if extra:
             unexpected.append(f"{full_name}: {', '.join(sorted(extra))}")
 
     if unexpected:
         fail("unexpected axioms detected: " + "; ".join(unexpected))
 
-    allowed = " / ".join(sorted(ALLOWED_AXIOMS))
+    allowed = " / ".join(sorted(allowed_axioms))
     print(f"AXIOM CHECK OK: only {allowed}")
 
 
