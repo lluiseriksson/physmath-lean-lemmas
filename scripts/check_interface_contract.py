@@ -138,6 +138,10 @@ def main() -> None:
         )
 
     digest = read_text(DIGEST_PATH)
+    expect_digest_anchor(
+        digest, "satellite", f"Satellite: `{expect_string(contract, 'satellite')}`"
+    )
+    expect_digest_anchor(digest, "node", f"Node: `{expect_string(contract, 'node')}`")
     expect_digest_anchor(digest, "repository", expect_string(contract, "repository"))
     expect_digest_anchor(digest, "source file", expect_string(contract, "source_file"))
     expect_digest_anchor(digest, "top-level import", f"import {import_module}")
