@@ -41,6 +41,17 @@ def expect_string(mapping: dict[str, object], key: str) -> str:
     return value
 
 
+def expect_string_list(mapping: dict[str, object], key: str) -> list[str]:
+    value = mapping.get(key)
+    if (
+        not isinstance(value, list)
+        or not value
+        or not all(isinstance(item, str) and item for item in value)
+    ):
+        fail(f"contract field {key!r} must be a nonempty list of strings")
+    return value
+
+
 def mathlib_input_rev() -> str:
     manifest = load_json(ROOT / "lake-manifest.json")
     if not isinstance(manifest, dict):
@@ -110,12 +121,22 @@ def main() -> None:
     declarations = contract.get("public_declarations")
     if not isinstance(declarations, list) or not declarations:
         fail("public_declarations must be a nonempty list")
+    seen_names: set[str] = set()
     for declaration in declarations:
         if not isinstance(declaration, dict):
             fail("each public declaration must be an object")
         name = expect_string(declaration, "name")
+        if name in seen_names:
+            fail(f"duplicate public declaration {name!r}")
+        seen_names.add(name)
+        if expect_string(declaration, "kind") != "theorem":
+            fail(f"public declaration {name!r} must have kind 'theorem'")
+        expect_string(declaration, "layer")
+        expect_string_list(declaration, "inputs")
+        expect_string(declaration, "conclusion")
         if not re.search(rf"\btheorem\s+{re.escape(name)}\b", source_text):
             fail(f"public declaration {name!r} is not a theorem in {source_file.name}")
+        expect_digest_anchor(digest, f"public declaration {name}", name)
 
     print("INTERFACE CONTRACT CHECK OK")
 
