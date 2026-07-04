@@ -81,6 +81,11 @@ def expect_digest_anchor(digest: str, label: str, needle: str) -> None:
         fail(f"mother-interface-digest.md is missing {label}: {needle}")
 
 
+def lean_module_name(path: Path) -> str:
+    rel = path.relative_to(ROOT).with_suffix("")
+    return ".".join(rel.parts)
+
+
 def main() -> None:
     contract = load_json(CONTRACT_PATH)
     if not isinstance(contract, dict):
@@ -98,6 +103,16 @@ def main() -> None:
             f"{source_file.relative_to(ROOT)} ({source_hash})"
         )
 
+    import_module = expect_string(contract, "import")
+    import_file = ROOT / f"{import_module.replace('.', '/')}.lean"
+    import_text = read_text(import_file)
+    source_module = lean_module_name(source_file)
+    if not re.search(rf"(?m)^\s*import\s+{re.escape(source_module)}\s*$", import_text):
+        fail(
+            f"contract import {import_module!r} does not re-export "
+            f"{source_module!r}"
+        )
+
     toolchain = read_text(ROOT / "lean-toolchain").strip()
     if expect_string(contract, "lean_toolchain") != toolchain:
         fail(f"lean_toolchain does not match lean-toolchain ({toolchain})")
@@ -113,6 +128,7 @@ def main() -> None:
 
     digest = read_text(DIGEST_PATH)
     expect_digest_anchor(digest, "source file", expect_string(contract, "source_file"))
+    expect_digest_anchor(digest, "top-level import", f"import {import_module}")
     expect_digest_anchor(digest, "interface contract path", "docs/interface-contract.json")
     expect_digest_anchor(digest, "source file sha256", source_hash)
     expect_digest_anchor(digest, "Lean toolchain", toolchain)
