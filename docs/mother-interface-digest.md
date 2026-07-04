@@ -21,6 +21,7 @@ origin.
 Current anchors:
 
 - Public repository: `https://github.com/lluiseriksson/physmath-lean-lemmas`
+- Machine-readable interface contract: `docs/interface-contract.json`
 - Main file sha256: `72ec2d77b2ae1959d90e7767ee986f4aa9b4582e3036409a1e65559fe9eb4edc`
 - Toolchain: `leanprover/lean4:v4.31.0`
 - Mathlib pin: `v4.31.0`, manifest rev

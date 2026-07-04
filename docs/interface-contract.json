@@ -1,0 +1,129 @@
+{
+  "schema": "physmath-lean-lemmas.interface.v1",
+  "satellite": "physmath-lean-lemmas",
+  "node": "bridge.three_infinities_rooted_closure",
+  "repository": "https://github.com/lluiseriksson/physmath-lean-lemmas",
+  "source_file": "PhysmathLemmas/ThreeInfinities.lean",
+  "source_file_sha256": "72ec2d77b2ae1959d90e7767ee986f4aa9b4582e3036409a1e65559fe9eb4edc",
+  "import": "PhysmathLemmas",
+  "namespace": "PhysmathLemmas",
+  "lean_toolchain": "leanprover/lean4:v4.31.0",
+  "mathlib_rev": "v4.31.0",
+  "consumption_rule": "Vendor PhysmathLemmas/ThreeInfinities.lean into the mother repository only after the required budget hypotheses exist; do not add this satellite as a Lake dependency of the sorry-free core.",
+  "public_declarations": [
+    {
+      "name": "tsum_geometric_le_of_le",
+      "kind": "theorem",
+      "layer": "ennreal-core",
+      "inputs": [
+        "r q : ENNReal",
+        "hrq : r <= q"
+      ],
+      "conclusion": "tsum (n : Nat), r ^ n <= (1 - q)^-1"
+    },
+    {
+      "name": "rootedTripleInfinity_closure_le",
+      "kind": "theorem",
+      "layer": "ennreal-core",
+      "inputs": [
+        "H : Nat -> Nat -> iota -> ENNReal",
+        "epsilon : Nat -> ENNReal",
+        "w : iota -> ENNReal",
+        "M L K q G : ENNReal",
+        "hH : forall k n Y, H k n Y <= M * epsilon k * (L * epsilon k) ^ n * w Y",
+        "hq : forall k, L * epsilon k <= q",
+        "hw : tsum Y, w Y <= K",
+        "hepsilon : tsum k, epsilon k <= G"
+      ],
+      "conclusion": "tsum (k : Nat) (n : Nat) (Y : iota), H k n Y <= M * G * K * (1 - q)^-1"
+    },
+    {
+      "name": "rootedTripleInfinity_closure_le_exp",
+      "kind": "theorem",
+      "layer": "ennreal-core",
+      "inputs": [
+        "H : Nat -> Nat -> iota -> ENNReal",
+        "epsilon g : Nat -> ENNReal",
+        "w : iota -> ENNReal",
+        "M L K q A G0 : ENNReal",
+        "c0 t : Real",
+        "hH : forall k n Y, H k n Y <= M * epsilon k * (L * epsilon k) ^ n * w Y",
+        "hq : forall k, L * epsilon k <= q",
+        "hw : tsum Y, w Y <= K",
+        "hprofile : forall k, epsilon k <= A * ENNReal.ofReal (Real.exp (-(c0 * t))) * g k",
+        "hg : tsum k, g k <= G0"
+      ],
+      "conclusion": "tsum (k : Nat) (n : Nat) (Y : iota), H k n Y <= M * A * K * G0 * (1 - q)^-1 * ENNReal.ofReal (Real.exp (-(c0 * t)))"
+    },
+    {
+      "name": "tsum_prod_nnnorm_le_of_rootedLeafBudget",
+      "kind": "theorem",
+      "layer": "normed-valued-consumer",
+      "inputs": [
+        "E : Type* with SeminormedAddCommGroup E",
+        "H : Nat -> Nat -> iota -> E",
+        "epsilon : Nat -> NNReal",
+        "w : iota -> NNReal",
+        "M L K q G : NNReal",
+        "hH : forall k n Y, nnnorm (H k n Y) <= M * epsilon k * (L * epsilon k) ^ n * w Y",
+        "hq : forall k, L * epsilon k <= q",
+        "hw : tsum Y, (w Y : ENNReal) <= K",
+        "hepsilon : tsum k, (epsilon k : ENNReal) <= G"
+      ],
+      "conclusion": "tsum p : Nat x Nat x iota, (nnnorm (H p.1 p.2.1 p.2.2) : ENNReal) <= (M : ENNReal) * G * K * (1 - (q : ENNReal))^-1"
+    },
+    {
+      "name": "summable_of_rootedLeafBudget",
+      "kind": "theorem",
+      "layer": "normed-valued-consumer",
+      "inputs": [
+        "E : Type* with SeminormedAddCommGroup E and CompleteSpace E",
+        "H : Nat -> Nat -> iota -> E",
+        "epsilon : Nat -> NNReal",
+        "w : iota -> NNReal",
+        "M L K q G : NNReal",
+        "hH : forall k n Y, nnnorm (H k n Y) <= M * epsilon k * (L * epsilon k) ^ n * w Y",
+        "hq : forall k, L * epsilon k <= q",
+        "hq1 : q < 1",
+        "hw : tsum Y, (w Y : ENNReal) <= K",
+        "hepsilon : tsum k, (epsilon k : ENNReal) <= G"
+      ],
+      "conclusion": "Summable (fun p : Nat x Nat x iota => H p.1 p.2.1 p.2.2)"
+    },
+    {
+      "name": "norm_tsum_le_of_rootedLeafBudget",
+      "kind": "theorem",
+      "layer": "normed-valued-consumer",
+      "inputs": [
+        "E : Type* with SeminormedAddCommGroup E and CompleteSpace E",
+        "H : Nat -> Nat -> iota -> E",
+        "epsilon : Nat -> NNReal",
+        "w : iota -> NNReal",
+        "M L K q G : NNReal",
+        "hH : forall k n Y, nnnorm (H k n Y) <= M * epsilon k * (L * epsilon k) ^ n * w Y",
+        "hq : forall k, L * epsilon k <= q",
+        "hq1 : q < 1",
+        "hw : tsum Y, (w Y : ENNReal) <= K",
+        "hepsilon : tsum k, (epsilon k : ENNReal) <= G"
+      ],
+      "conclusion": "norm (tsum p : Nat x Nat x iota, H p.1 p.2.1 p.2.2) <= ((M * G * K * (1 - q)^-1 : NNReal) : Real)"
+    }
+  ],
+  "verification": {
+    "commands": [
+      "lake build",
+      "./scripts/check_axioms.sh",
+      "! grep -rnE 'sorry|admit|native_decide' --include='*.lean' PhysmathLemmas PhysmathLemmas.lean"
+    ],
+    "allowed_axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "forbidden_tokens": [
+      "sorry",
+      "admit",
+      "native_decide"
+    ]
+  }
+}
