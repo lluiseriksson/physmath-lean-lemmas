@@ -10,8 +10,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Source-level sorry gate
-        run: |
-          ! grep -rnE "sorry|admit|native_decide" --include="*.lean" PhysmathLemmas PhysmathLemmas.lean
+        run: python3 scripts/check_forbidden_tokens.py
       - name: Interface contract drift check
         run: python3 scripts/check_interface_contract.py
       - name: Install elan
