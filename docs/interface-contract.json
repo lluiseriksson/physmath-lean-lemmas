@@ -113,6 +113,7 @@
     "commands": [
       "lake build",
       "./scripts/check_axioms.sh",
+      "python3 scripts/check_interface_contract.py",
       "python3 scripts/check_forbidden_tokens.py"
     ],
     "allowed_axioms": [
