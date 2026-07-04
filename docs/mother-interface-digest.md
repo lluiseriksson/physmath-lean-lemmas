@@ -170,6 +170,7 @@ Before vendoring a changed copy into the mother repo, rerun:
 lake exe cache get
 lake build
 ./scripts/check_axioms.sh
+python3 scripts/check_interface_contract.py
 ! grep -rnE 'sorry|admit|native_decide' --include='*.lean' PhysmathLemmas PhysmathLemmas.lean
 ```
 
