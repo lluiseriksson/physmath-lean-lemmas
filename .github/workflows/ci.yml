@@ -21,5 +21,7 @@ jobs:
         run: lake exe cache get
       - name: Build (0 errors, 0 sorry)
         run: lake build
+      - name: Portable axiom audit (contract allowlist)
+        run: python3 scripts/check_axioms.py
       - name: Axiom audit (propext / Classical.choice / Quot.sound only)
         run: ./scripts/check_axioms.sh
