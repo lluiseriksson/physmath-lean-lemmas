@@ -200,5 +200,5 @@ Expected public axiom set for the six exported theorems:
 Forbidden proof tokens in public Lean sources:
 
 ```text
-[sorry, admit, native_decide]
+[sorry, admit, axiom, native_decide]
 ```

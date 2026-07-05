@@ -101,8 +101,8 @@ lake build                    # 0 errors, 0 sorry
 ./scripts/check_axioms.sh     # only propext / Classical.choice / Quot.sound
 ```
 
-CI does exactly this on every push, plus a source-level `sorry`/`admit`
-grep gate.
+CI does exactly this on every push, plus a contract-driven source-level
+forbidden-token gate for `sorry`, `admit`, `axiom` and `native_decide`.
 
 ## Roadmap (next general lemmas)
 
