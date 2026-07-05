@@ -7,6 +7,7 @@ import hashlib
 import json
 import re
 import sys
+import tomllib
 from pathlib import Path
 
 
@@ -85,6 +86,32 @@ def lakefile_mathlib_rev() -> str:
     return match.group(1)
 
 
+def lakefile_direct_requirements() -> list[dict[str, str]]:
+    try:
+        lakefile = tomllib.loads(read_text(ROOT / "lakefile.toml"))
+    except tomllib.TOMLDecodeError as err:
+        fail(f"lakefile.toml is not valid TOML: {err}")
+
+    requirements = lakefile.get("require")
+    if requirements is None:
+        return []
+    if not isinstance(requirements, list):
+        fail("lakefile.toml require entries must be a list")
+
+    normalized: list[dict[str, str]] = []
+    for requirement in requirements:
+        if not isinstance(requirement, dict):
+            fail("each lakefile.toml require entry must be an object")
+        item: dict[str, str] = {}
+        for key in ("name", "scope", "rev"):
+            value = requirement.get(key)
+            if not isinstance(value, str) or not value:
+                fail(f"each lakefile.toml require entry needs a nonempty {key}")
+            item[key] = value
+        normalized.append(item)
+    return normalized
+
+
 def expect_digest_anchor(digest: str, label: str, needle: str) -> None:
     if needle not in digest:
         fail(f"mother-interface-digest.md is missing {label}: {needle}")
@@ -155,6 +182,27 @@ def main() -> None:
             f"contract={mathlib_rev}, manifest={manifest_rev}, lakefile={lake_rev}"
         )
 
+    direct_lake_requirements = contract.get("direct_lake_requirements")
+    if not isinstance(direct_lake_requirements, list):
+        fail("direct_lake_requirements must be a list")
+    expected_requirements: list[dict[str, str]] = []
+    for requirement in direct_lake_requirements:
+        if not isinstance(requirement, dict):
+            fail("each direct_lake_requirements entry must be an object")
+        expected_requirements.append(
+            {
+                "name": expect_string(requirement, "name"),
+                "scope": expect_string(requirement, "scope"),
+                "rev": expect_string(requirement, "rev"),
+            }
+        )
+    actual_requirements = lakefile_direct_requirements()
+    if expected_requirements != actual_requirements:
+        fail(
+            "direct Lake requirements drift: "
+            f"contract={expected_requirements}, lakefile={actual_requirements}"
+        )
+
     digest = read_text(DIGEST_PATH)
     readme = read_text(README_PATH)
     ci_workflow = read_text(CI_WORKFLOW_PATH)
@@ -171,6 +219,16 @@ def main() -> None:
     expect_digest_anchor(digest, "source imports field", "source_imports")
     for source_import in declared_imports:
         expect_digest_anchor(digest, f"source import {source_import}", source_import)
+    expect_digest_anchor(digest, "direct Lake requirements field", "direct_lake_requirements")
+    for requirement in expected_requirements:
+        requirement_anchor = (
+            f"{requirement['scope']}/{requirement['name']}@{requirement['rev']}"
+        )
+        expect_digest_anchor(
+            digest,
+            f"direct Lake requirement {requirement_anchor}",
+            requirement_anchor,
+        )
     expect_digest_anchor(digest, "Lean toolchain", toolchain)
     expect_digest_anchor(digest, "Mathlib rev", mathlib_rev)
     expect_digest_anchor(

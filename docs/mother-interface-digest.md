@@ -25,6 +25,9 @@ Current anchors:
 - Contract consumption rule: Vendor PhysmathLemmas/ThreeInfinities.lean into the mother repository only after the required budget hypotheses exist; do not add this satellite as a Lake dependency of the sorry-free core.
 - Machine-readable source imports: `source_imports` in
   `docs/interface-contract.json`
+- Direct Lake requirements: `direct_lake_requirements` in
+  `docs/interface-contract.json` currently contains only
+  `leanprover-community/mathlib@v4.31.0`
 - Top-level import after vendoring: `import PhysmathLemmas`
 - Main file sha256: `72ec2d77b2ae1959d90e7767ee986f4aa9b4582e3036409a1e65559fe9eb4edc`
 - Toolchain: `leanprover/lean4:v4.31.0`
