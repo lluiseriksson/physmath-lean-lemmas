@@ -14,6 +14,7 @@ ROOT = Path(__file__).resolve().parents[1]
 CONTRACT_PATH = ROOT / "docs" / "interface-contract.json"
 DIGEST_PATH = ROOT / "docs" / "mother-interface-digest.md"
 README_PATH = ROOT / "README.md"
+CI_WORKFLOW_PATH = ROOT / ".github" / "workflows" / "ci.yml"
 
 
 def fail(message: str) -> None:
@@ -156,6 +157,7 @@ def main() -> None:
 
     digest = read_text(DIGEST_PATH)
     readme = read_text(README_PATH)
+    ci_workflow = read_text(CI_WORKFLOW_PATH)
     expect_digest_anchor(
         digest, "satellite", f"Satellite: `{expect_string(contract, 'satellite')}`"
     )
@@ -186,6 +188,8 @@ def main() -> None:
     verification = expect_object(contract, "verification")
     for command in expect_string_list(verification, "commands"):
         expect_digest_anchor(digest, f"verification command {command}", command)
+        if command not in ci_workflow:
+            fail(f"CI workflow is missing verification command: {command}")
     for axiom in expect_string_list(verification, "allowed_axioms"):
         expect_digest_anchor(digest, f"allowed axiom {axiom}", axiom)
     for token in expect_string_list(verification, "forbidden_tokens"):
