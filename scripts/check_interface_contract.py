@@ -220,7 +220,19 @@ def main() -> None:
         if name not in readme:
             fail(f"README.md is missing public declaration {name!r}")
 
-    source_theorems = set(source_theorem_names(source_text))
+    source_theorem_order = source_theorem_names(source_text)
+    contract_theorem_order = [
+        declaration["name"]
+        for declaration in declarations
+        if isinstance(declaration, dict)
+    ]
+    if contract_theorem_order != source_theorem_order:
+        fail(
+            "public_declarations order drift: "
+            f"contract={contract_theorem_order}, source={source_theorem_order}"
+        )
+
+    source_theorems = set(source_theorem_order)
     missing_from_contract = sorted(source_theorems - seen_names)
     if missing_from_contract:
         fail(
