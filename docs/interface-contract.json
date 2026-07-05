@@ -3,6 +3,7 @@
   "satellite": "physmath-lean-lemmas",
   "node": "bridge.three_infinities_rooted_closure",
   "repository": "https://github.com/lluiseriksson/physmath-lean-lemmas",
+  "status_file": "STATUS.json",
   "source_file": "PhysmathLemmas/ThreeInfinities.lean",
   "source_file_sha256": "72ec2d77b2ae1959d90e7767ee986f4aa9b4582e3036409a1e65559fe9eb4edc",
   "source_imports": [
