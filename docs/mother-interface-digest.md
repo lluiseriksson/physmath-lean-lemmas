@@ -192,3 +192,9 @@ Expected public axiom set for the six exported theorems:
 ```text
 [propext, Classical.choice, Quot.sound]
 ```
+
+Forbidden proof tokens in public Lean sources:
+
+```text
+[sorry, admit, native_decide]
+```

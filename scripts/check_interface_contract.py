@@ -181,6 +181,8 @@ def main() -> None:
         expect_digest_anchor(digest, f"verification command {command}", command)
     for axiom in expect_string_list(verification, "allowed_axioms"):
         expect_digest_anchor(digest, f"allowed axiom {axiom}", axiom)
+    for token in expect_string_list(verification, "forbidden_tokens"):
+        expect_digest_anchor(digest, f"forbidden token {token}", token)
 
     declarations = contract.get("public_declarations")
     if not isinstance(declarations, list) or not declarations:
