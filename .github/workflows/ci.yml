@@ -21,6 +21,8 @@ jobs:
         run: lake exe cache get
       - name: Build (0 errors, 0 sorry)
         run: lake build
+      - name: Public import smoke test
+        run: lake env lean test/InterfaceSmoke.lean
       - name: Portable axiom audit (contract allowlist)
         run: python3 scripts/check_axioms.py
       - name: Axiom audit (propext / Classical.choice / Quot.sound only)

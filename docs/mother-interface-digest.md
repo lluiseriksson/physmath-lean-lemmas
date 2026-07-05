@@ -188,6 +188,7 @@ Before vendoring a changed copy into the mother repo, rerun:
 ```bash
 lake exe cache get
 lake build
+lake env lean test/InterfaceSmoke.lean
 ./scripts/check_axioms.sh
 python3 scripts/check_axioms.py
 python3 scripts/check_interface_contract.py
