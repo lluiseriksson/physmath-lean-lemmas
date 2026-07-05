@@ -83,6 +83,22 @@ def mathlib_input_rev() -> str:
     fail("lake-manifest.json does not contain a mathlib package")
 
 
+def mathlib_manifest_rev() -> str:
+    manifest = load_json(ROOT / "lake-manifest.json")
+    if not isinstance(manifest, dict):
+        fail("lake-manifest.json root must be an object")
+    packages = manifest.get("packages")
+    if not isinstance(packages, list):
+        fail("lake-manifest.json must contain a packages list")
+    for package in packages:
+        if isinstance(package, dict) and package.get("name") == "mathlib":
+            rev = package.get("rev")
+            if isinstance(rev, str) and rev:
+                return rev
+            fail("mathlib package is missing rev")
+    fail("lake-manifest.json does not contain a mathlib package")
+
+
 def lakefile_mathlib_rev() -> str:
     lakefile = read_text(ROOT / "lakefile.toml")
     match = re.search(r'(?m)^\s*rev\s*=\s*"([^"]+)"\s*$', lakefile)
@@ -196,6 +212,18 @@ def main() -> None:
             f"contract={mathlib_rev}, manifest={manifest_rev}, lakefile={lake_rev}"
         )
     expect_equal(status.get("mathlib_rev"), mathlib_rev, "STATUS mathlib_rev")
+    mathlib_package_rev = mathlib_manifest_rev()
+    if expect_string(contract, "mathlib_manifest_rev") != mathlib_package_rev:
+        fail(
+            "mathlib_manifest_rev drift: "
+            f"contract={expect_string(contract, 'mathlib_manifest_rev')}, "
+            f"manifest={mathlib_package_rev}"
+        )
+    expect_equal(
+        status.get("mathlib_manifest_rev"),
+        mathlib_package_rev,
+        "STATUS mathlib_manifest_rev",
+    )
 
     direct_lake_requirements = contract.get("direct_lake_requirements")
     if not isinstance(direct_lake_requirements, list):
@@ -269,6 +297,7 @@ def main() -> None:
         )
     expect_digest_anchor(digest, "Lean toolchain", toolchain)
     expect_digest_anchor(digest, "Mathlib rev", mathlib_rev)
+    expect_digest_anchor(digest, "Mathlib manifest rev", mathlib_package_rev)
     expect_digest_anchor(
         digest, "consumption rule", expect_string(contract, "consumption_rule")
     )

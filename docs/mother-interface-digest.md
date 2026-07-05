@@ -34,6 +34,8 @@ Current anchors:
 - Toolchain: `leanprover/lean4:v4.31.0`
 - Mathlib pin: `v4.31.0`, manifest rev
   `fabf563a7c95a166b8d7b6efca11c8b4dc9d911f`
+- Mathlib manifest rev field: `mathlib_manifest_rev =
+  fabf563a7c95a166b8d7b6efca11c8b4dc9d911f`
 - Release zip sha256:
   `edcaa76668dce5dd87fbef1930bf765aefdca1519a7b3a540730e5418b7e062b`
 
