@@ -183,6 +183,13 @@ def main() -> None:
         if name in seen_names:
             fail(f"duplicate public declaration {name!r}")
         seen_names.add(name)
+        qualified_name = expect_string(declaration, "qualified_name")
+        expected_qualified_name = f"{namespace}.{name}"
+        if qualified_name != expected_qualified_name:
+            fail(
+                f"public declaration {name!r} has qualified_name "
+                f"{qualified_name!r}, expected {expected_qualified_name!r}"
+            )
         if expect_string(declaration, "kind") != "theorem":
             fail(f"public declaration {name!r} must have kind 'theorem'")
         expect_string(declaration, "layer")
@@ -191,6 +198,9 @@ def main() -> None:
         if not re.search(rf"\btheorem\s+{re.escape(name)}\b", source_text):
             fail(f"public declaration {name!r} is not a theorem in {source_file.name}")
         expect_digest_anchor(digest, f"public declaration {name}", name)
+        expect_digest_anchor(
+            digest, f"qualified public declaration {qualified_name}", qualified_name
+        )
 
     print("INTERFACE CONTRACT CHECK OK")
 
