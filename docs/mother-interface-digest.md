@@ -22,6 +22,7 @@ Current anchors:
 
 - Public repository: `https://github.com/lluiseriksson/physmath-lean-lemmas`
 - Machine-readable interface contract: `docs/interface-contract.json`
+- Machine-readable status heartbeat: `STATUS.json`
 - Contract consumption rule: Vendor PhysmathLemmas/ThreeInfinities.lean into the mother repository only after the required budget hypotheses exist; do not add this satellite as a Lake dependency of the sorry-free core.
 - Machine-readable source imports: `source_imports` in
   `docs/interface-contract.json`

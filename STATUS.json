@@ -1,0 +1,44 @@
+{
+  "schema": "physmath-lean-lemmas.status.v1",
+  "satellite": "physmath-lean-lemmas",
+  "node": "bridge.three_infinities_rooted_closure",
+  "repository": "https://github.com/lluiseriksson/physmath-lean-lemmas",
+  "status": "green",
+  "scope": "bookkeeping/interface lemmas only; no source-estimate, continuum, mass-gap, reconstruction, or Clay-adjacent claim",
+  "source_file": "PhysmathLemmas/ThreeInfinities.lean",
+  "source_file_sha256": "72ec2d77b2ae1959d90e7767ee986f4aa9b4582e3036409a1e65559fe9eb4edc",
+  "interface_contract": "docs/interface-contract.json",
+  "mother_interface_digest": "docs/mother-interface-digest.md",
+  "lean_toolchain": "leanprover/lean4:v4.31.0",
+  "mathlib_rev": "v4.31.0",
+  "public_declarations": [
+    "PhysmathLemmas.tsum_geometric_le_of_le",
+    "PhysmathLemmas.rootedTripleInfinity_closure_le",
+    "PhysmathLemmas.rootedTripleInfinity_closure_le_exp",
+    "PhysmathLemmas.tsum_prod_nnnorm_le_of_rootedLeafBudget",
+    "PhysmathLemmas.summable_of_rootedLeafBudget",
+    "PhysmathLemmas.norm_tsum_le_of_rootedLeafBudget"
+  ],
+  "verification": {
+    "ci_workflow": ".github/workflows/ci.yml",
+    "commands": [
+      "lake build",
+      "./scripts/check_axioms.sh",
+      "python3 scripts/check_axioms.py",
+      "python3 scripts/check_interface_contract.py",
+      "python3 scripts/check_forbidden_tokens.py"
+    ],
+    "allowed_axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "forbidden_tokens": [
+      "sorry",
+      "admit",
+      "axiom",
+      "native_decide"
+    ]
+  },
+  "consumption_rule": "Vendor PhysmathLemmas/ThreeInfinities.lean into the mother repository only after the required budget hypotheses exist; do not add this satellite as a Lake dependency of the sorry-free core."
+}

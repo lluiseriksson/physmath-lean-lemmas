@@ -62,6 +62,11 @@ def expect_object(mapping: dict[str, object], key: str) -> dict[str, object]:
     return value
 
 
+def expect_equal(actual: object, expected: object, label: str) -> None:
+    if actual != expected:
+        fail(f"{label} drift: status={actual!r}, expected={expected!r}")
+
+
 def mathlib_input_rev() -> str:
     manifest = load_json(ROOT / "lake-manifest.json")
     if not isinstance(manifest, dict):
@@ -138,6 +143,13 @@ def main() -> None:
     if expect_string(contract, "schema") != "physmath-lean-lemmas.interface.v1":
         fail("unexpected schema")
 
+    status_path = ROOT / expect_string(contract, "status_file")
+    status = load_json(status_path)
+    if not isinstance(status, dict):
+        fail(f"{status_path.relative_to(ROOT)} root must be an object")
+    if expect_string(status, "schema") != "physmath-lean-lemmas.status.v1":
+        fail("unexpected status schema")
+
     source_file = ROOT / expect_string(contract, "source_file")
     source_text = read_text(source_file)
     source_hash = hashlib.sha256(source_file.read_bytes()).hexdigest()
@@ -146,6 +158,7 @@ def main() -> None:
             "source_file_sha256 does not match "
             f"{source_file.relative_to(ROOT)} ({source_hash})"
         )
+    expect_equal(status.get("source_file_sha256"), source_hash, "STATUS source_file_sha256")
 
     import_module = expect_string(contract, "import")
     import_file = ROOT / f"{import_module.replace('.', '/')}.lean"
@@ -172,6 +185,7 @@ def main() -> None:
     toolchain = read_text(ROOT / "lean-toolchain").strip()
     if expect_string(contract, "lean_toolchain") != toolchain:
         fail(f"lean_toolchain does not match lean-toolchain ({toolchain})")
+    expect_equal(status.get("lean_toolchain"), toolchain, "STATUS lean_toolchain")
 
     mathlib_rev = expect_string(contract, "mathlib_rev")
     manifest_rev = mathlib_input_rev()
@@ -181,6 +195,7 @@ def main() -> None:
             "mathlib_rev drift: "
             f"contract={mathlib_rev}, manifest={manifest_rev}, lakefile={lake_rev}"
         )
+    expect_equal(status.get("mathlib_rev"), mathlib_rev, "STATUS mathlib_rev")
 
     direct_lake_requirements = contract.get("direct_lake_requirements")
     if not isinstance(direct_lake_requirements, list):
@@ -203,6 +218,28 @@ def main() -> None:
             f"contract={expected_requirements}, lakefile={actual_requirements}"
         )
 
+    for key in (
+        "satellite",
+        "node",
+        "repository",
+        "source_file",
+        "consumption_rule",
+    ):
+        expect_equal(status.get(key), expect_string(contract, key), f"STATUS {key}")
+    expect_equal(
+        status.get("interface_contract"),
+        str(CONTRACT_PATH.relative_to(ROOT)).replace("\\", "/"),
+        "STATUS interface_contract",
+    )
+    expect_equal(
+        status.get("mother_interface_digest"),
+        str(DIGEST_PATH.relative_to(ROOT)).replace("\\", "/"),
+        "STATUS mother_interface_digest",
+    )
+    if expect_string(status, "status") != "green":
+        fail("STATUS status must be 'green'")
+    expect_string(status, "scope")
+
     digest = read_text(DIGEST_PATH)
     readme = read_text(README_PATH)
     ci_workflow = read_text(CI_WORKFLOW_PATH)
@@ -215,6 +252,7 @@ def main() -> None:
     expect_digest_anchor(digest, "top-level import", f"import {import_module}")
     expect_digest_anchor(digest, "namespace", f"namespace {namespace}")
     expect_digest_anchor(digest, "interface contract path", "docs/interface-contract.json")
+    expect_digest_anchor(digest, "status file path", expect_string(contract, "status_file"))
     expect_digest_anchor(digest, "source file sha256", source_hash)
     expect_digest_anchor(digest, "source imports field", "source_imports")
     for source_import in declared_imports:
@@ -239,6 +277,7 @@ def main() -> None:
         ("source file", expect_string(contract, "source_file")),
         ("interface digest path", "docs/mother-interface-digest.md"),
         ("interface contract path", "docs/interface-contract.json"),
+        ("status file path", expect_string(contract, "status_file")),
     ):
         if needle not in readme:
             fail(f"README.md is missing {label}: {needle}")
@@ -253,10 +292,33 @@ def main() -> None:
     for token in expect_string_list(verification, "forbidden_tokens"):
         expect_digest_anchor(digest, f"forbidden token {token}", token)
 
+    status_verification = expect_object(status, "verification")
+    expect_equal(
+        status_verification.get("ci_workflow"),
+        str(CI_WORKFLOW_PATH.relative_to(ROOT)).replace("\\", "/"),
+        "STATUS verification.ci_workflow",
+    )
+    expect_equal(
+        status_verification.get("commands"),
+        expect_string_list(verification, "commands"),
+        "STATUS verification.commands",
+    )
+    expect_equal(
+        status_verification.get("allowed_axioms"),
+        expect_string_list(verification, "allowed_axioms"),
+        "STATUS verification.allowed_axioms",
+    )
+    expect_equal(
+        status_verification.get("forbidden_tokens"),
+        expect_string_list(verification, "forbidden_tokens"),
+        "STATUS verification.forbidden_tokens",
+    )
+
     declarations = contract.get("public_declarations")
     if not isinstance(declarations, list) or not declarations:
         fail("public_declarations must be a nonempty list")
     seen_names: set[str] = set()
+    qualified_names: list[str] = []
     for declaration in declarations:
         if not isinstance(declaration, dict):
             fail("each public declaration must be an object")
@@ -271,6 +333,7 @@ def main() -> None:
                 f"public declaration {name!r} has qualified_name "
                 f"{qualified_name!r}, expected {expected_qualified_name!r}"
             )
+        qualified_names.append(qualified_name)
         if expect_string(declaration, "kind") != "theorem":
             fail(f"public declaration {name!r} must have kind 'theorem'")
         expect_string(declaration, "layer")
@@ -284,6 +347,12 @@ def main() -> None:
         )
         if name not in readme:
             fail(f"README.md is missing public declaration {name!r}")
+
+    expect_equal(
+        status.get("public_declarations"),
+        qualified_names,
+        "STATUS public_declarations",
+    )
 
     source_theorem_order = source_theorem_names(source_text)
     contract_theorem_order = [
