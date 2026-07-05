@@ -98,6 +98,10 @@ def source_imports(source_text: str) -> list[str]:
     return re.findall(r"(?m)^\s*import\s+([A-Za-z0-9_'.]+)\s*$", source_text)
 
 
+def source_theorem_names(source_text: str) -> list[str]:
+    return re.findall(r"(?m)^\s*theorem\s+([A-Za-z_][A-Za-z0-9_']*)\b", source_text)
+
+
 def main() -> None:
     contract = load_json(CONTRACT_PATH)
     if not isinstance(contract, dict):
@@ -215,6 +219,14 @@ def main() -> None:
         )
         if name not in readme:
             fail(f"README.md is missing public declaration {name!r}")
+
+    source_theorems = set(source_theorem_names(source_text))
+    missing_from_contract = sorted(source_theorems - seen_names)
+    if missing_from_contract:
+        fail(
+            "source theorem declarations missing from public_declarations: "
+            + ", ".join(missing_from_contract)
+        )
 
     print("INTERFACE CONTRACT CHECK OK")
 
