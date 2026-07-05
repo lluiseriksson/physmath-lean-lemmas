@@ -69,4 +69,29 @@ example [SeminormedAddCommGroup E] [CompleteSpace E]
       ≤ ((M * G * K * (1 - q)⁻¹ : NNReal) : ℝ) :=
   PhysmathLemmas.norm_tsum_le_of_rootedLeafBudget H ε w hH hq hq1 hw hε
 
+example [SeminormedAddCommGroup E] [CompleteSpace E]
+    (Hprod : ℕ × ℕ × ι → E) (ε : ℕ → NNReal) (w : ι → NNReal)
+    {M L K q G : NNReal}
+    (hH : ∀ k n Y, ‖Hprod (k, n, Y)‖₊ ≤ M * ε k * (L * ε k) ^ n * w Y)
+    (hq : ∀ k, L * ε k ≤ q) (hq1 : q < 1)
+    (hw : ∑' Y, (w Y : ENNReal) ≤ K)
+    (hε : ∑' k, (ε k : ENNReal) ≤ G) :
+    Summable Hprod := by
+  simpa [Prod.eta] using
+    PhysmathLemmas.summable_of_rootedLeafBudget
+      (fun k n Y => Hprod (k, n, Y)) ε w hH hq hq1 hw hε
+
+example [SeminormedAddCommGroup E] [CompleteSpace E]
+    (Hprod : ℕ × ℕ × ι → E) (ε : ℕ → NNReal) (w : ι → NNReal)
+    {M L K q G : NNReal}
+    (hH : ∀ k n Y, ‖Hprod (k, n, Y)‖₊ ≤ M * ε k * (L * ε k) ^ n * w Y)
+    (hq : ∀ k, L * ε k ≤ q) (hq1 : q < 1)
+    (hw : ∑' Y, (w Y : ENNReal) ≤ K)
+    (hε : ∑' k, (ε k : ENNReal) ≤ G) :
+    ‖∑' p : ℕ × ℕ × ι, Hprod p‖
+      ≤ ((M * G * K * (1 - q)⁻¹ : NNReal) : ℝ) := by
+  simpa [Prod.eta] using
+    PhysmathLemmas.norm_tsum_le_of_rootedLeafBudget
+      (fun k n Y => Hprod (k, n, Y)) ε w hH hq hq1 hw hε
+
 end PhysmathLemmasInterfaceSmoke
