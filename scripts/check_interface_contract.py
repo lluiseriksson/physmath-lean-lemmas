@@ -13,6 +13,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 CONTRACT_PATH = ROOT / "docs" / "interface-contract.json"
 DIGEST_PATH = ROOT / "docs" / "mother-interface-digest.md"
+README_PATH = ROOT / "README.md"
 
 
 def fail(message: str) -> None:
@@ -150,6 +151,7 @@ def main() -> None:
         )
 
     digest = read_text(DIGEST_PATH)
+    readme = read_text(README_PATH)
     expect_digest_anchor(
         digest, "satellite", f"Satellite: `{expect_string(contract, 'satellite')}`"
     )
@@ -165,6 +167,14 @@ def main() -> None:
         expect_digest_anchor(digest, f"source import {source_import}", source_import)
     expect_digest_anchor(digest, "Lean toolchain", toolchain)
     expect_digest_anchor(digest, "Mathlib rev", mathlib_rev)
+
+    for label, needle in (
+        ("source file", expect_string(contract, "source_file")),
+        ("interface digest path", "docs/mother-interface-digest.md"),
+        ("interface contract path", "docs/interface-contract.json"),
+    ):
+        if needle not in readme:
+            fail(f"README.md is missing {label}: {needle}")
 
     verification = expect_object(contract, "verification")
     for command in expect_string_list(verification, "commands"):
@@ -201,6 +211,8 @@ def main() -> None:
         expect_digest_anchor(
             digest, f"qualified public declaration {qualified_name}", qualified_name
         )
+        if name not in readme:
+            fail(f"README.md is missing public declaration {name!r}")
 
     print("INTERFACE CONTRACT CHECK OK")
 

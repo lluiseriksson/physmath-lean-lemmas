@@ -81,7 +81,9 @@ audited copy, no external dependency in the trust chain.
 
 For the exact current consumer interface, including theorem signatures,
 required hypotheses and verification anchors, see
-[`docs/mother-interface-digest.md`](docs/mother-interface-digest.md).
+[`docs/mother-interface-digest.md`](docs/mother-interface-digest.md). The
+machine-readable contract is
+[`docs/interface-contract.json`](docs/interface-contract.json).
 
 ## Mathlib?
 
