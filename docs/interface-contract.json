@@ -19,6 +19,7 @@
   "public_declarations": [
     {
       "name": "tsum_geometric_le_of_le",
+      "qualified_name": "PhysmathLemmas.tsum_geometric_le_of_le",
       "kind": "theorem",
       "layer": "ennreal-core",
       "inputs": [
@@ -29,6 +30,7 @@
     },
     {
       "name": "rootedTripleInfinity_closure_le",
+      "qualified_name": "PhysmathLemmas.rootedTripleInfinity_closure_le",
       "kind": "theorem",
       "layer": "ennreal-core",
       "inputs": [
@@ -45,6 +47,7 @@
     },
     {
       "name": "rootedTripleInfinity_closure_le_exp",
+      "qualified_name": "PhysmathLemmas.rootedTripleInfinity_closure_le_exp",
       "kind": "theorem",
       "layer": "ennreal-core",
       "inputs": [
@@ -63,6 +66,7 @@
     },
     {
       "name": "tsum_prod_nnnorm_le_of_rootedLeafBudget",
+      "qualified_name": "PhysmathLemmas.tsum_prod_nnnorm_le_of_rootedLeafBudget",
       "kind": "theorem",
       "layer": "normed-valued-consumer",
       "inputs": [
@@ -80,6 +84,7 @@
     },
     {
       "name": "summable_of_rootedLeafBudget",
+      "qualified_name": "PhysmathLemmas.summable_of_rootedLeafBudget",
       "kind": "theorem",
       "layer": "normed-valued-consumer",
       "inputs": [
@@ -98,6 +103,7 @@
     },
     {
       "name": "norm_tsum_le_of_rootedLeafBudget",
+      "qualified_name": "PhysmathLemmas.norm_tsum_le_of_rootedLeafBudget",
       "kind": "theorem",
       "layer": "normed-valued-consumer",
       "inputs": [

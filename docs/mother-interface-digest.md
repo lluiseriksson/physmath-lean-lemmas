@@ -49,6 +49,15 @@ All public declarations below live in:
 namespace PhysmathLemmas
 ```
 
+Fully qualified public API names:
+
+- `PhysmathLemmas.tsum_geometric_le_of_le`
+- `PhysmathLemmas.rootedTripleInfinity_closure_le`
+- `PhysmathLemmas.rootedTripleInfinity_closure_le_exp`
+- `PhysmathLemmas.tsum_prod_nnnorm_le_of_rootedLeafBudget`
+- `PhysmathLemmas.summable_of_rootedLeafBudget`
+- `PhysmathLemmas.norm_tsum_le_of_rootedLeafBudget`
+
 ## ENNReal Core
 
 Use this layer when the target quantity is nonnegative extended real and no
