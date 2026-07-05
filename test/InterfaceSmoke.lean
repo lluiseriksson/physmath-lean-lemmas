@@ -1,0 +1,8 @@
+import PhysmathLemmas
+
+#check PhysmathLemmas.tsum_geometric_le_of_le
+#check PhysmathLemmas.rootedTripleInfinity_closure_le
+#check PhysmathLemmas.rootedTripleInfinity_closure_le_exp
+#check PhysmathLemmas.tsum_prod_nnnorm_le_of_rootedLeafBudget
+#check PhysmathLemmas.summable_of_rootedLeafBudget
+#check PhysmathLemmas.norm_tsum_le_of_rootedLeafBudget
