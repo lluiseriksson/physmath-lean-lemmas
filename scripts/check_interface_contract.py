@@ -171,6 +171,9 @@ def main() -> None:
         expect_digest_anchor(digest, f"source import {source_import}", source_import)
     expect_digest_anchor(digest, "Lean toolchain", toolchain)
     expect_digest_anchor(digest, "Mathlib rev", mathlib_rev)
+    expect_digest_anchor(
+        digest, "consumption rule", expect_string(contract, "consumption_rule")
+    )
 
     for label, needle in (
         ("source file", expect_string(contract, "source_file")),
