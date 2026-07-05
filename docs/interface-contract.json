@@ -15,6 +15,13 @@
   "namespace": "PhysmathLemmas",
   "lean_toolchain": "leanprover/lean4:v4.31.0",
   "mathlib_rev": "v4.31.0",
+  "direct_lake_requirements": [
+    {
+      "name": "mathlib",
+      "scope": "leanprover-community",
+      "rev": "v4.31.0"
+    }
+  ],
   "consumption_rule": "Vendor PhysmathLemmas/ThreeInfinities.lean into the mother repository only after the required budget hypotheses exist; do not add this satellite as a Lake dependency of the sorry-free core.",
   "public_declarations": [
     {
