@@ -169,6 +169,33 @@ theorem norm_tsum_le_of_rootedLeafBudget [CompleteSpace E]
       ≤ ((M * G * K * (1 - q)⁻¹ : ℝ≥0) : ℝ)
 ```
 
+## Product-Indexed Consumer Adapter
+
+If the mother repository already stores the activity as a single product
+index,
+
+```lean
+Hprod : ℕ × ℕ × ι → E
+```
+
+consume the normed-valued layer by currying at the call site:
+
+```lean
+PhysmathLemmas.summable_of_rootedLeafBudget
+  (fun k n Y => Hprod (k, n, Y)) ε w hH hq hq1 hw hε
+```
+
+where the pointwise budget has the matching product-indexed shape:
+
+```lean
+hH : ∀ k n Y,
+  ‖Hprod (k, n, Y)‖₊ ≤ M * ε k * (L * ε k) ^ n * w Y
+```
+
+Use the same adapter for `norm_tsum_le_of_rootedLeafBudget`. This is only a
+consumer-side indexing convention; it does not change the exported API or
+the trusted Lean file to vendor.
+
 ## Suggested Instantiation Order
 
 1. Prove the mother-side pointwise bound `hH`.
