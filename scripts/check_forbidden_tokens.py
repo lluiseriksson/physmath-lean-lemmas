@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Reject forbidden Lean proof tokens in public source files."""
+"""Reject forbidden Lean proof tokens in proof-bearing Lean files."""
 
 from __future__ import annotations
 
@@ -11,7 +11,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 CONTRACT_PATH = ROOT / "docs" / "interface-contract.json"
-TARGETS = [ROOT / "PhysmathLemmas", ROOT / "PhysmathLemmas.lean"]
+TARGETS = [ROOT / "PhysmathLemmas", ROOT / "PhysmathLemmas.lean", ROOT / "test"]
 
 
 def fail(message: str) -> None:
