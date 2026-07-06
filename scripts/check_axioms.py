@@ -32,7 +32,6 @@ def load_contract() -> dict[str, object]:
 
 
 def load_public_declarations(contract: dict[str, object]) -> list[str]:
-
     declarations = contract.get("public_declarations")
     if not isinstance(declarations, list) or not declarations:
         fail("public_declarations must be a nonempty list")
@@ -41,10 +40,10 @@ def load_public_declarations(contract: dict[str, object]) -> list[str]:
     for declaration in declarations:
         if not isinstance(declaration, dict):
             fail("each public declaration must be an object")
-        name = declaration.get("name")
-        if not isinstance(name, str) or not name:
-            fail("each public declaration needs a nonempty name")
-        names.append(name)
+        qualified_name = declaration.get("qualified_name")
+        if not isinstance(qualified_name, str) or not qualified_name:
+            fail("each public declaration needs a nonempty qualified_name")
+        names.append(qualified_name)
     return names
 
 
@@ -63,13 +62,13 @@ def load_allowed_axioms(contract: dict[str, object]) -> set[str]:
 
 
 def lean_axiom_query(names: list[str]) -> str:
-    lines = ["import PhysmathLemmas", "open PhysmathLemmas"]
+    lines = ["import PhysmathLemmas"]
     lines.extend(f"#print axioms {name}" for name in names)
     return "\n".join(lines) + "\n"
 
 
 def parse_axioms(stdout: str, names: list[str]) -> dict[str, set[str]]:
-    expected = {f"PhysmathLemmas.{name}" for name in names}
+    expected = set(names)
     found: dict[str, set[str]] = {}
     depends_pattern = re.compile(r"^'([^']+)' depends on axioms: \[(.*)\]$")
     none_pattern = re.compile(r"^'([^']+)' does not depend on any axioms$")
