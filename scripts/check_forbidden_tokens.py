@@ -50,14 +50,15 @@ def lean_files(path: Path) -> list[Path]:
 
 
 def main() -> None:
-    pattern = re.compile("|".join(re.escape(token) for token in forbidden_tokens()))
+    token_pattern = "|".join(re.escape(token) for token in forbidden_tokens())
+    pattern = re.compile(rf"(?<![A-Za-z0-9_'])({token_pattern})(?![A-Za-z0-9_'])")
     hits: list[str] = []
     for target in TARGETS:
         for path in lean_files(target):
             rel = path.relative_to(ROOT)
             for lineno, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
-                if pattern.search(line):
-                    hits.append(f"{rel}:{lineno}: {line.strip()}")
+                for match in pattern.finditer(line):
+                    hits.append(f"{rel}:{lineno}:{match.start() + 1}: {line.strip()}")
 
     if hits:
         print("FORBIDDEN TOKEN DETECTED", file=sys.stderr)
