@@ -7,6 +7,7 @@
   "scope": "bookkeeping/interface lemmas only; no source-estimate, continuum, mass-gap, reconstruction, or Clay-adjacent claim",
   "source_file": "PhysmathLemmas/ThreeInfinities.lean",
   "source_file_sha256": "72ec2d77b2ae1959d90e7767ee986f4aa9b4582e3036409a1e65559fe9eb4edc",
+  "release_zip_sha256": "edcaa76668dce5dd87fbef1930bf765aefdca1519a7b3a540730e5418b7e062b",
   "interface_contract": "docs/interface-contract.json",
   "mother_interface_digest": "docs/mother-interface-digest.md",
   "lean_toolchain": "leanprover/lean4:v4.31.0",

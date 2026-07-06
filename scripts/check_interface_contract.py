@@ -67,6 +67,11 @@ def expect_equal(actual: object, expected: object, label: str) -> None:
         fail(f"{label} drift: status={actual!r}, expected={expected!r}")
 
 
+def expect_sha256_hex(value: str, label: str) -> None:
+    if not re.fullmatch(r"[0-9a-f]{64}", value):
+        fail(f"{label} must be a lowercase sha256 hex digest")
+
+
 def mathlib_input_rev() -> str:
     manifest = load_json(ROOT / "lake-manifest.json")
     if not isinstance(manifest, dict):
@@ -186,6 +191,13 @@ def main() -> None:
             f"{source_file.relative_to(ROOT)} ({source_hash})"
         )
     expect_equal(status.get("source_file_sha256"), source_hash, "STATUS source_file_sha256")
+    release_zip_sha256 = expect_string(contract, "release_zip_sha256")
+    expect_sha256_hex(release_zip_sha256, "release_zip_sha256")
+    expect_equal(
+        status.get("release_zip_sha256"),
+        release_zip_sha256,
+        "STATUS release_zip_sha256",
+    )
 
     import_module = expect_string(contract, "import")
     import_file = ROOT / f"{import_module.replace('.', '/')}.lean"
@@ -293,6 +305,7 @@ def main() -> None:
     expect_digest_anchor(digest, "interface contract path", "docs/interface-contract.json")
     expect_digest_anchor(digest, "status file path", expect_string(contract, "status_file"))
     expect_digest_anchor(digest, "source file sha256", source_hash)
+    expect_digest_anchor(digest, "release zip sha256", release_zip_sha256)
     expect_digest_anchor(digest, "source imports field", "source_imports")
     for source_import in declared_imports:
         expect_digest_anchor(digest, f"source import {source_import}", source_import)
