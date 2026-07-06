@@ -187,6 +187,14 @@ def source_imports(source_text: str) -> list[str]:
     return re.findall(r"(?m)^\s*import\s+([A-Za-z0-9_'.]+)\s*$", source_text)
 
 
+def significant_lean_lines(source_text: str) -> list[str]:
+    return [
+        line.strip()
+        for line in source_text.splitlines()
+        if line.strip() and not line.strip().startswith("--")
+    ]
+
+
 def source_theorem_names(source_text: str) -> list[str]:
     return re.findall(r"(?m)^\s*theorem\s+([A-Za-z_][A-Za-z0-9_']*)\b", source_text)
 
@@ -231,6 +239,13 @@ def main() -> None:
         fail(
             f"contract import {import_module!r} does not re-export "
             f"{source_module!r}"
+        )
+    expected_public_import = [f"import {source_module}"]
+    actual_public_import = significant_lean_lines(import_text)
+    if actual_public_import != expected_public_import:
+        fail(
+            f"{import_file.relative_to(ROOT)} must be a minimal public re-export: "
+            f"expected={expected_public_import}, actual={actual_public_import}"
         )
     interface_smoke = read_text(INTERFACE_SMOKE_PATH)
     direct_source_smoke = read_text(DIRECT_SOURCE_SMOKE_PATH)
