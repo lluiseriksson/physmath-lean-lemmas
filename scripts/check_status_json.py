@@ -13,6 +13,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 STATUS_PATH = ROOT / "STATUS.json"
 CONTRACT_PATH = ROOT / "docs" / "interface-contract.json"
+DIGEST_PATH = ROOT / "docs" / "mother-interface-digest.md"
 CI_WORKFLOW_PATH = ROOT / ".github" / "workflows" / "ci.yml"
 
 
@@ -89,6 +90,11 @@ def main() -> None:
         "consumption_rule",
     ):
         expect_equal(status.get(key), expect_string(contract, key), key)
+    expect_equal(
+        expect_string(contract, "status_file"),
+        str(STATUS_PATH.relative_to(ROOT)).replace("\\", "/"),
+        "contract.status_file",
+    )
 
     source_file = ROOT / expect_string(status, "source_file")
     source_hash = hashlib.sha256(source_file.read_bytes()).hexdigest()
@@ -104,6 +110,11 @@ def main() -> None:
     digest_path = ROOT / expect_string(status, "mother_interface_digest")
     if not digest_path.is_file():
         fail(f"mother_interface_digest does not exist: {digest_path.relative_to(ROOT)}")
+    expect_equal(
+        status.get("mother_interface_digest"),
+        str(DIGEST_PATH.relative_to(ROOT)).replace("\\", "/"),
+        "mother_interface_digest",
+    )
     expect_equal(
         status.get("interface_contract"),
         str(CONTRACT_PATH.relative_to(ROOT)).replace("\\", "/"),
