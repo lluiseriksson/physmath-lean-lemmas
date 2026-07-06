@@ -164,6 +164,20 @@ def digest_fully_qualified_api_names(digest: str) -> list[str]:
     return re.findall(r"(?m)^- `([^`\n]+)`$", match.group("items"))
 
 
+def digest_verification_commands(digest: str) -> list[str]:
+    match = re.search(
+        r"(?ms)^## Verification Gate\n.*?```bash\n(?P<commands>.*?)\n```",
+        digest,
+    )
+    if not match:
+        fail("mother-interface-digest.md is missing the verification command block")
+    return [
+        line.strip()
+        for line in match.group("commands").splitlines()
+        if line.strip() and not line.strip().startswith("#")
+    ]
+
+
 def lean_module_name(path: Path) -> str:
     rel = path.relative_to(ROOT).with_suffix("")
     return ".".join(rel.parts)
@@ -363,7 +377,15 @@ def main() -> None:
             fail(f"README.md is missing {label}: {needle}")
 
     verification = expect_object(contract, "verification")
-    for command in expect_string_list(verification, "commands"):
+    verification_commands = expect_string_list(verification, "commands")
+    expected_digest_commands = ["lake exe cache get", *verification_commands]
+    actual_digest_commands = digest_verification_commands(digest)
+    if actual_digest_commands != expected_digest_commands:
+        fail(
+            "mother-interface-digest.md verification command block drift: "
+            f"digest={actual_digest_commands}, expected={expected_digest_commands}"
+        )
+    for command in verification_commands:
         expect_digest_anchor(digest, f"verification command {command}", command)
         if command not in ci_workflow:
             fail(f"CI workflow is missing verification command: {command}")
