@@ -220,6 +220,7 @@ lake env lean test/DirectSourceImportSmoke.lean
 ./scripts/check_axioms.sh
 python3 scripts/check_axioms.py
 python3 scripts/check_interface_contract.py
+python3 scripts/check_status_json.py
 python3 scripts/check_forbidden_tokens.py
 ```
 

@@ -13,6 +13,8 @@ jobs:
         run: python3 scripts/check_forbidden_tokens.py
       - name: Interface contract drift check
         run: python3 scripts/check_interface_contract.py
+      - name: Status heartbeat drift check
+        run: python3 scripts/check_status_json.py
       - name: Install elan
         run: |
           curl -sSf https://elan.lean-lang.org/elan-init.sh | sh -s -- -y --default-toolchain none
