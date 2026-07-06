@@ -18,6 +18,14 @@ README_PATH = ROOT / "README.md"
 CI_WORKFLOW_PATH = ROOT / ".github" / "workflows" / "ci.yml"
 INTERFACE_SMOKE_PATH = ROOT / "test" / "InterfaceSmoke.lean"
 DIRECT_SOURCE_SMOKE_PATH = ROOT / "test" / "DirectSourceImportSmoke.lean"
+EXPECTED_DIGEST_SCOPE_MARKERS = (
+    "bookkeeping/interface",
+    "source estimate",
+    "continuum",
+    "mass gap",
+    "reconstruction",
+    "Clay-adjacent",
+)
 
 
 def fail(message: str) -> None:
@@ -310,6 +318,9 @@ def main() -> None:
     digest = read_text(DIGEST_PATH)
     readme = read_text(README_PATH)
     ci_workflow = read_text(CI_WORKFLOW_PATH)
+    for marker in EXPECTED_DIGEST_SCOPE_MARKERS:
+        if marker not in digest:
+            fail(f"mother-interface-digest.md is missing scope marker: {marker}")
     expect_digest_anchor(
         digest, "satellite", f"Satellite: `{expect_string(contract, 'satellite')}`"
     )
