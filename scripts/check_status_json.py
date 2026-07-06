@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import re
 import sys
 from pathlib import Path
 
@@ -63,6 +64,11 @@ def expect_equal(actual: object, expected: object, label: str) -> None:
         fail(f"{label} drift: status={actual!r}, expected={expected!r}")
 
 
+def expect_sha256_hex(value: str, label: str) -> None:
+    if not re.fullmatch(r"[0-9a-f]{64}", value):
+        fail(f"{label} must be a lowercase sha256 hex digest")
+
+
 def main() -> None:
     status = expect_object(load_json(STATUS_PATH), "STATUS.json")
     contract = expect_object(load_json(CONTRACT_PATH), "docs/interface-contract.json")
@@ -87,6 +93,13 @@ def main() -> None:
     source_file = ROOT / expect_string(status, "source_file")
     source_hash = hashlib.sha256(source_file.read_bytes()).hexdigest()
     expect_equal(status.get("source_file_sha256"), source_hash, "source_file_sha256")
+    release_zip_sha256 = expect_string(status, "release_zip_sha256")
+    expect_sha256_hex(release_zip_sha256, "release_zip_sha256")
+    expect_equal(
+        release_zip_sha256,
+        expect_string(contract, "release_zip_sha256"),
+        "release_zip_sha256",
+    )
 
     digest_path = ROOT / expect_string(status, "mother_interface_digest")
     if not digest_path.is_file():
