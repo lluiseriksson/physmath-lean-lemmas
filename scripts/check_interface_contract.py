@@ -178,6 +178,37 @@ def digest_verification_commands(digest: str) -> list[str]:
     ]
 
 
+def ci_run_commands(ci_workflow: str) -> list[str]:
+    commands: list[str] = []
+    lines = ci_workflow.splitlines()
+    index = 0
+    while index < len(lines):
+        line = lines[index]
+        match = re.match(r"^(?P<indent>\s*)run:\s*(?P<value>.*)$", line)
+        if not match:
+            index += 1
+            continue
+
+        value = match.group("value").strip()
+        if value and value not in {"|", ">"}:
+            commands.append(value)
+            index += 1
+            continue
+
+        block_indent = len(match.group("indent")) + 2
+        index += 1
+        while index < len(lines):
+            block_line = lines[index]
+            actual_indent = len(block_line) - len(block_line.lstrip())
+            if block_line.strip() and actual_indent < block_indent:
+                break
+            stripped = block_line.strip()
+            if stripped and not stripped.startswith("#"):
+                commands.append(stripped)
+            index += 1
+    return commands
+
+
 def lean_module_name(path: Path) -> str:
     rel = path.relative_to(ROOT).with_suffix("")
     return ".".join(rel.parts)
@@ -400,9 +431,10 @@ def main() -> None:
             "mother-interface-digest.md verification command block drift: "
             f"digest={actual_digest_commands}, expected={expected_digest_commands}"
         )
+    ci_commands = ci_run_commands(ci_workflow)
     for command in verification_commands:
         expect_digest_anchor(digest, f"verification command {command}", command)
-        if command not in ci_workflow:
+        if command not in ci_commands:
             fail(f"CI workflow is missing verification command: {command}")
     for axiom in expect_string_list(verification, "allowed_axioms"):
         expect_digest_anchor(digest, f"allowed axiom {axiom}", axiom)
