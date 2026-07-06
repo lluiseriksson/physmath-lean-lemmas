@@ -138,6 +138,17 @@ def expect_digest_anchor(digest: str, label: str, needle: str) -> None:
         fail(f"mother-interface-digest.md is missing {label}: {needle}")
 
 
+def digest_fully_qualified_api_names(digest: str) -> list[str]:
+    match = re.search(
+        r"(?ms)^Fully qualified public API names:\n\n"
+        r"(?P<items>(?:- `[^`\n]+`\n)+)",
+        digest,
+    )
+    if not match:
+        fail("mother-interface-digest.md is missing the fully qualified API list")
+    return re.findall(r"(?m)^- `([^`\n]+)`$", match.group("items"))
+
+
 def lean_module_name(path: Path) -> str:
     rel = path.relative_to(ROOT).with_suffix("")
     return ".".join(rel.parts)
@@ -401,6 +412,13 @@ def main() -> None:
         fail(
             "source theorem declarations missing from public_declarations: "
             + ", ".join(missing_from_contract)
+        )
+
+    digest_api_names = digest_fully_qualified_api_names(digest)
+    if digest_api_names != qualified_names:
+        fail(
+            "mother-interface-digest.md fully qualified API list drift: "
+            f"digest={digest_api_names}, contract={qualified_names}"
         )
 
     print("INTERFACE CONTRACT CHECK OK")
