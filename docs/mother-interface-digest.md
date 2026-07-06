@@ -65,6 +65,73 @@ Fully qualified public API names:
 - `PhysmathLemmas.summable_of_rootedLeafBudget`
 - `PhysmathLemmas.norm_tsum_le_of_rootedLeafBudget`
 
+## Contract Declaration Summaries
+
+The following ASCII summaries mirror `docs/interface-contract.json` exactly
+and are checked by `scripts/check_interface_contract.py`.
+
+- `tsum_geometric_le_of_le` (`ennreal-core`)
+  - input: `r q : ENNReal`
+  - input: `hrq : r <= q`
+  - conclusion: `tsum (n : Nat), r ^ n <= (1 - q)^-1`
+- `rootedTripleInfinity_closure_le` (`ennreal-core`)
+  - input: `H : Nat -> Nat -> iota -> ENNReal`
+  - input: `epsilon : Nat -> ENNReal`
+  - input: `w : iota -> ENNReal`
+  - input: `M L K q G : ENNReal`
+  - input: `hH : forall k n Y, H k n Y <= M * epsilon k * (L * epsilon k) ^ n * w Y`
+  - input: `hq : forall k, L * epsilon k <= q`
+  - input: `hw : tsum Y, w Y <= K`
+  - input: `hepsilon : tsum k, epsilon k <= G`
+  - conclusion: `tsum (k : Nat) (n : Nat) (Y : iota), H k n Y <= M * G * K * (1 - q)^-1`
+- `rootedTripleInfinity_closure_le_exp` (`ennreal-core`)
+  - input: `H : Nat -> Nat -> iota -> ENNReal`
+  - input: `epsilon g : Nat -> ENNReal`
+  - input: `w : iota -> ENNReal`
+  - input: `M L K q A G0 : ENNReal`
+  - input: `c0 t : Real`
+  - input: `hH : forall k n Y, H k n Y <= M * epsilon k * (L * epsilon k) ^ n * w Y`
+  - input: `hq : forall k, L * epsilon k <= q`
+  - input: `hw : tsum Y, w Y <= K`
+  - input: `hprofile : forall k, epsilon k <= A * ENNReal.ofReal (Real.exp (-(c0 * t))) * g k`
+  - input: `hg : tsum k, g k <= G0`
+  - conclusion: `tsum (k : Nat) (n : Nat) (Y : iota), H k n Y <= M * A * K * G0 * (1 - q)^-1 * ENNReal.ofReal (Real.exp (-(c0 * t)))`
+- `tsum_prod_nnnorm_le_of_rootedLeafBudget` (`normed-valued-consumer`)
+  - input: `E : Type* with SeminormedAddCommGroup E`
+  - input: `H : Nat -> Nat -> iota -> E`
+  - input: `epsilon : Nat -> NNReal`
+  - input: `w : iota -> NNReal`
+  - input: `M L K q G : NNReal`
+  - input: `hH : forall k n Y, nnnorm (H k n Y) <= M * epsilon k * (L * epsilon k) ^ n * w Y`
+  - input: `hq : forall k, L * epsilon k <= q`
+  - input: `hw : tsum Y, (w Y : ENNReal) <= K`
+  - input: `hepsilon : tsum k, (epsilon k : ENNReal) <= G`
+  - conclusion: `tsum p : Nat x Nat x iota, (nnnorm (H p.1 p.2.1 p.2.2) : ENNReal) <= (M : ENNReal) * G * K * (1 - (q : ENNReal))^-1`
+- `summable_of_rootedLeafBudget` (`normed-valued-consumer`)
+  - input: `E : Type* with SeminormedAddCommGroup E and CompleteSpace E`
+  - input: `H : Nat -> Nat -> iota -> E`
+  - input: `epsilon : Nat -> NNReal`
+  - input: `w : iota -> NNReal`
+  - input: `M L K q G : NNReal`
+  - input: `hH : forall k n Y, nnnorm (H k n Y) <= M * epsilon k * (L * epsilon k) ^ n * w Y`
+  - input: `hq : forall k, L * epsilon k <= q`
+  - input: `hq1 : q < 1`
+  - input: `hw : tsum Y, (w Y : ENNReal) <= K`
+  - input: `hepsilon : tsum k, (epsilon k : ENNReal) <= G`
+  - conclusion: `Summable (fun p : Nat x Nat x iota => H p.1 p.2.1 p.2.2)`
+- `norm_tsum_le_of_rootedLeafBudget` (`normed-valued-consumer`)
+  - input: `E : Type* with SeminormedAddCommGroup E and CompleteSpace E`
+  - input: `H : Nat -> Nat -> iota -> E`
+  - input: `epsilon : Nat -> NNReal`
+  - input: `w : iota -> NNReal`
+  - input: `M L K q G : NNReal`
+  - input: `hH : forall k n Y, nnnorm (H k n Y) <= M * epsilon k * (L * epsilon k) ^ n * w Y`
+  - input: `hq : forall k, L * epsilon k <= q`
+  - input: `hq1 : q < 1`
+  - input: `hw : tsum Y, (w Y : ENNReal) <= K`
+  - input: `hepsilon : tsum k, (epsilon k : ENNReal) <= G`
+  - conclusion: `norm (tsum p : Nat x Nat x iota, H p.1 p.2.1 p.2.2) <= ((M * G * K * (1 - q)^-1 : NNReal) : Real)`
+
 ## ENNReal Core
 
 Use this layer when the target quantity is nonnegative extended real and no

@@ -497,14 +497,30 @@ def main() -> None:
         qualified_names.append(qualified_name)
         if expect_string(declaration, "kind") != "theorem":
             fail(f"public declaration {name!r} must have kind 'theorem'")
-        expect_string(declaration, "layer")
-        expect_string_list(declaration, "inputs")
-        expect_string(declaration, "conclusion")
+        layer = expect_string(declaration, "layer")
+        inputs = expect_string_list(declaration, "inputs")
+        conclusion = expect_string(declaration, "conclusion")
         if not re.search(rf"\btheorem\s+{re.escape(name)}\b", source_text):
             fail(f"public declaration {name!r} is not a theorem in {source_file.name}")
         expect_digest_anchor(digest, f"public declaration {name}", name)
         expect_digest_anchor(
             digest, f"qualified public declaration {qualified_name}", qualified_name
+        )
+        expect_digest_anchor(
+            digest,
+            f"contract summary for {name}",
+            f"- `{name}` (`{layer}`)",
+        )
+        for input_line in inputs:
+            expect_digest_anchor(
+                digest,
+                f"contract input for {name}: {input_line}",
+                f"  - input: `{input_line}`",
+            )
+        expect_digest_anchor(
+            digest,
+            f"contract conclusion for {name}",
+            f"  - conclusion: `{conclusion}`",
         )
         for smoke_path, smoke_text in (
             (INTERFACE_SMOKE_PATH, interface_smoke),
