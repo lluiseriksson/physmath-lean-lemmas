@@ -15,6 +15,14 @@ STATUS_PATH = ROOT / "STATUS.json"
 CONTRACT_PATH = ROOT / "docs" / "interface-contract.json"
 DIGEST_PATH = ROOT / "docs" / "mother-interface-digest.md"
 CI_WORKFLOW_PATH = ROOT / ".github" / "workflows" / "ci.yml"
+EXPECTED_SCOPE_MARKERS = (
+    "bookkeeping/interface",
+    "no source-estimate",
+    "continuum",
+    "mass-gap",
+    "reconstruction",
+    "Clay-adjacent",
+)
 
 
 def fail(message: str) -> None:
@@ -78,6 +86,10 @@ def main() -> None:
         fail("unexpected STATUS schema")
     if expect_string(status, "status") != "green":
         fail("STATUS status must be 'green'")
+    scope = expect_string(status, "scope")
+    for marker in EXPECTED_SCOPE_MARKERS:
+        if marker not in scope:
+            fail(f"scope is missing required disclaimer marker: {marker}")
 
     for key in (
         "satellite",
