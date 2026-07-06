@@ -226,6 +226,11 @@ def main() -> None:
     ci_verification_commands = [
         command for command in ci_commands if is_verification_command(command)
     ]
+    if ci_verification_commands != verification_commands:
+        fail(
+            "verification command order drift: "
+            f"status={verification_commands}, ci={ci_verification_commands}"
+        )
     if set(ci_verification_commands) != set(verification_commands):
         missing_from_status = sorted(
             set(ci_verification_commands) - set(verification_commands)
