@@ -78,6 +78,37 @@ def expect_sha256_hex(value: str, label: str) -> None:
         fail(f"{label} must be a lowercase sha256 hex digest")
 
 
+def ci_run_commands(ci_workflow: str) -> list[str]:
+    commands: list[str] = []
+    lines = ci_workflow.splitlines()
+    index = 0
+    while index < len(lines):
+        line = lines[index]
+        match = re.match(r"^(?P<indent>\s*)run:\s*(?P<value>.*)$", line)
+        if not match:
+            index += 1
+            continue
+
+        value = match.group("value").strip()
+        if value and value not in {"|", ">"}:
+            commands.append(value)
+            index += 1
+            continue
+
+        block_indent = len(match.group("indent")) + 2
+        index += 1
+        while index < len(lines):
+            block_line = lines[index]
+            actual_indent = len(block_line) - len(block_line.lstrip())
+            if block_line.strip() and actual_indent < block_indent:
+                break
+            stripped = block_line.strip()
+            if stripped and not stripped.startswith("#"):
+                commands.append(stripped)
+            index += 1
+    return commands
+
+
 def main() -> None:
     status = expect_object(load_json(STATUS_PATH), "STATUS.json")
     contract = expect_object(load_json(CONTRACT_PATH), "docs/interface-contract.json")
@@ -155,8 +186,9 @@ def main() -> None:
         "verification.ci_workflow",
     )
     ci_workflow = read_text(CI_WORKFLOW_PATH)
+    ci_commands = ci_run_commands(ci_workflow)
     for command in expect_string_list(verification, "commands"):
-        if command not in ci_workflow:
+        if command not in ci_commands:
             fail(f"CI workflow is missing verification command: {command}")
 
     contract_verification = expect_object(contract.get("verification"), "contract verification")
