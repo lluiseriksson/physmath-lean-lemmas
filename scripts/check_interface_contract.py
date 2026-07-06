@@ -164,6 +164,18 @@ def digest_fully_qualified_api_names(digest: str) -> list[str]:
     return re.findall(r"(?m)^- `([^`\n]+)`$", match.group("items"))
 
 
+def readme_public_declaration_names(readme: str) -> list[str]:
+    match = re.search(
+        r"(?ms)^\| declaration \| content \|\n"
+        r"\|---\|---\|\n"
+        r"(?P<rows>(?:\| `[^`\n]+` \| [^\n]*\|\n)+)",
+        readme,
+    )
+    if not match:
+        fail("README.md is missing the public declaration table")
+    return re.findall(r"(?m)^\| `([^`\n]+)` \|", match.group("rows"))
+
+
 def digest_verification_commands(digest: str) -> list[str]:
     match = re.search(
         r"(?ms)^## Verification Gate\n.*?```bash\n(?P<commands>.*?)\n```",
@@ -522,6 +534,13 @@ def main() -> None:
         fail(
             "public_declarations order drift: "
             f"contract={contract_theorem_order}, source={source_theorem_order}"
+        )
+
+    readme_theorem_order = readme_public_declaration_names(readme)
+    if readme_theorem_order != contract_theorem_order:
+        fail(
+            "README.md public declaration table drift: "
+            f"readme={readme_theorem_order}, contract={contract_theorem_order}"
         )
 
     source_theorems = set(source_theorem_order)
