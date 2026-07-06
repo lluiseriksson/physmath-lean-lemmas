@@ -127,6 +127,15 @@ def ci_run_commands(ci_workflow: str) -> list[str]:
     return commands
 
 
+def is_verification_command(command: str) -> bool:
+    return (
+        command == "lake build"
+        or command.startswith("lake env lean test/")
+        or command.startswith("python3 scripts/check_")
+        or command.startswith("./scripts/check_")
+    )
+
+
 def main() -> None:
     status = expect_object(load_json(STATUS_PATH), "STATUS.json")
     contract = expect_object(load_json(CONTRACT_PATH), "docs/interface-contract.json")
@@ -210,9 +219,26 @@ def main() -> None:
     )
     ci_workflow = read_text(CI_WORKFLOW_PATH)
     ci_commands = ci_run_commands(ci_workflow)
-    for command in expect_string_list(verification, "commands"):
+    verification_commands = expect_string_list(verification, "commands")
+    for command in verification_commands:
         if command not in ci_commands:
             fail(f"CI workflow is missing verification command: {command}")
+    ci_verification_commands = [
+        command for command in ci_commands if is_verification_command(command)
+    ]
+    if set(ci_verification_commands) != set(verification_commands):
+        missing_from_status = sorted(
+            set(ci_verification_commands) - set(verification_commands)
+        )
+        missing_from_ci = sorted(
+            set(verification_commands) - set(ci_verification_commands)
+        )
+        details = []
+        if missing_from_status:
+            details.append("missing from STATUS: " + ", ".join(missing_from_status))
+        if missing_from_ci:
+            details.append("missing from CI: " + ", ".join(missing_from_ci))
+        fail("verification command set drift: " + "; ".join(details))
 
     contract_verification = expect_object(contract.get("verification"), "contract verification")
     for key in ("commands", "allowed_axioms", "forbidden_tokens"):
