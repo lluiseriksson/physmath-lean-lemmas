@@ -153,6 +153,10 @@ def expect_digest_anchor(digest: str, label: str, needle: str) -> None:
         fail(f"mother-interface-digest.md is missing {label}: {needle}")
 
 
+def contains_normalized_text(haystack: str, needle: str) -> bool:
+    return " ".join(needle.split()) in " ".join(haystack.split())
+
+
 def digest_fully_qualified_api_names(digest: str) -> list[str]:
     match = re.search(
         r"(?ms)^Fully qualified public API names:\n\n"
@@ -430,8 +434,9 @@ def main() -> None:
         ("interface digest path", "docs/mother-interface-digest.md"),
         ("interface contract path", "docs/interface-contract.json"),
         ("status file path", expect_string(contract, "status_file")),
+        ("consumption rule", expect_string(contract, "consumption_rule")),
     ):
-        if needle not in readme:
+        if not contains_normalized_text(readme, needle):
             fail(f"README.md is missing {label}: {needle}")
 
     verification = expect_object(contract, "verification")
