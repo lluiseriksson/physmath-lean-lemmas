@@ -68,6 +68,24 @@ def expect_string_list(mapping: dict[str, object], key: str) -> list[str]:
     return value
 
 
+def expect_requirement_list(mapping: dict[str, object], key: str) -> list[dict[str, str]]:
+    value = mapping.get(key)
+    if not isinstance(value, list):
+        fail(f"{key!r} must be a list")
+    requirements: list[dict[str, str]] = []
+    for requirement in value:
+        if not isinstance(requirement, dict):
+            fail(f"{key!r} entries must be objects")
+        normalized: dict[str, str] = {}
+        for field in ("name", "scope", "rev"):
+            field_value = requirement.get(field)
+            if not isinstance(field_value, str) or not field_value:
+                fail(f"{key!r} entries need a nonempty {field}")
+            normalized[field] = field_value
+        requirements.append(normalized)
+    return requirements
+
+
 def expect_equal(actual: object, expected: object, label: str) -> None:
     if actual != expected:
         fail(f"{label} drift: status={actual!r}, expected={expected!r}")
@@ -133,6 +151,11 @@ def main() -> None:
         "consumption_rule",
     ):
         expect_equal(status.get(key), expect_string(contract, key), key)
+    expect_equal(
+        expect_requirement_list(status, "direct_lake_requirements"),
+        expect_requirement_list(contract, "direct_lake_requirements"),
+        "direct_lake_requirements",
+    )
     expect_equal(
         expect_string(contract, "status_file"),
         str(STATUS_PATH.relative_to(ROOT)).replace("\\", "/"),

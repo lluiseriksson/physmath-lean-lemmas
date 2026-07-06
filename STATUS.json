@@ -13,6 +13,13 @@
   "lean_toolchain": "leanprover/lean4:v4.31.0",
   "mathlib_rev": "v4.31.0",
   "mathlib_manifest_rev": "fabf563a7c95a166b8d7b6efca11c8b4dc9d911f",
+  "direct_lake_requirements": [
+    {
+      "name": "mathlib",
+      "scope": "leanprover-community",
+      "rev": "v4.31.0"
+    }
+  ],
   "public_declarations": [
     "PhysmathLemmas.tsum_geometric_le_of_le",
     "PhysmathLemmas.rootedTripleInfinity_closure_le",
