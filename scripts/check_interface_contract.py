@@ -16,6 +16,8 @@ CONTRACT_PATH = ROOT / "docs" / "interface-contract.json"
 DIGEST_PATH = ROOT / "docs" / "mother-interface-digest.md"
 README_PATH = ROOT / "README.md"
 CI_WORKFLOW_PATH = ROOT / ".github" / "workflows" / "ci.yml"
+INTERFACE_SMOKE_PATH = ROOT / "test" / "InterfaceSmoke.lean"
+DIRECT_SOURCE_SMOKE_PATH = ROOT / "test" / "DirectSourceImportSmoke.lean"
 
 
 def fail(message: str) -> None:
@@ -208,6 +210,20 @@ def main() -> None:
             f"contract import {import_module!r} does not re-export "
             f"{source_module!r}"
         )
+    interface_smoke = read_text(INTERFACE_SMOKE_PATH)
+    direct_source_smoke = read_text(DIRECT_SOURCE_SMOKE_PATH)
+    if not re.search(rf"(?m)^\s*import\s+{re.escape(import_module)}\s*$", interface_smoke):
+        fail(
+            f"{INTERFACE_SMOKE_PATH.relative_to(ROOT)} must smoke-test "
+            f"the public import {import_module!r}"
+        )
+    if not re.search(
+        rf"(?m)^\s*import\s+{re.escape(source_module)}\s*$", direct_source_smoke
+    ):
+        fail(
+            f"{DIRECT_SOURCE_SMOKE_PATH.relative_to(ROOT)} must smoke-test "
+            f"the direct source import {source_module!r}"
+        )
 
     namespace = expect_string(contract, "namespace")
     if not re.search(rf"(?m)^\s*namespace\s+{re.escape(namespace)}\s*$", source_text):
@@ -398,6 +414,15 @@ def main() -> None:
         expect_digest_anchor(
             digest, f"qualified public declaration {qualified_name}", qualified_name
         )
+        for smoke_path, smoke_text in (
+            (INTERFACE_SMOKE_PATH, interface_smoke),
+            (DIRECT_SOURCE_SMOKE_PATH, direct_source_smoke),
+        ):
+            if qualified_name not in smoke_text:
+                fail(
+                    f"{smoke_path.relative_to(ROOT)} is missing smoke-test anchor "
+                    f"for {qualified_name}"
+                )
         if name not in readme:
             fail(f"README.md is missing public declaration {name!r}")
 
