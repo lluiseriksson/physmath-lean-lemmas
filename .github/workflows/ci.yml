@@ -27,7 +27,7 @@ jobs:
         run: lake env lean test/InterfaceSmoke.lean
       - name: Direct source import smoke test
         run: lake env lean test/DirectSourceImportSmoke.lean
-      - name: Portable axiom audit (contract allowlist)
-        run: python3 scripts/check_axioms.py
       - name: Axiom audit (propext / Classical.choice / Quot.sound only)
         run: ./scripts/check_axioms.sh
+      - name: Portable axiom audit (contract allowlist)
+        run: python3 scripts/check_axioms.py
