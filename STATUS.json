@@ -31,14 +31,14 @@
   "verification": {
     "ci_workflow": ".github/workflows/ci.yml",
     "commands": [
+      "python3 scripts/check_forbidden_tokens.py",
+      "python3 scripts/check_interface_contract.py",
+      "python3 scripts/check_status_json.py",
       "lake build",
       "lake env lean test/InterfaceSmoke.lean",
       "lake env lean test/DirectSourceImportSmoke.lean",
       "./scripts/check_axioms.sh",
-      "python3 scripts/check_axioms.py",
-      "python3 scripts/check_interface_contract.py",
-      "python3 scripts/check_status_json.py",
-      "python3 scripts/check_forbidden_tokens.py"
+      "python3 scripts/check_axioms.py"
     ],
     "allowed_axioms": [
       "propext",
