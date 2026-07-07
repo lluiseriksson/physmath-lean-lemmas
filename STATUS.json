@@ -13,6 +13,12 @@
   "lean_toolchain": "leanprover/lean4:v4.31.0",
   "mathlib_rev": "v4.31.0",
   "mathlib_manifest_rev": "fabf563a7c95a166b8d7b6efca11c8b4dc9d911f",
+  "source_imports": [
+    "Mathlib.Analysis.SpecificLimits.Basic",
+    "Mathlib.Analysis.SpecialFunctions.Exp",
+    "Mathlib.Topology.Algebra.InfiniteSum.Constructions",
+    "Mathlib.Topology.Algebra.InfiniteSum.ENNReal"
+  ],
   "direct_lake_requirements": [
     {
       "name": "mathlib",
