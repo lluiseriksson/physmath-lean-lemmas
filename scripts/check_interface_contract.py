@@ -194,6 +194,20 @@ def digest_verification_commands(digest: str) -> list[str]:
     ]
 
 
+def readme_build_commands(readme: str) -> list[str]:
+    match = re.search(
+        r"(?ms)^## Build\n.*?```bash\n(?P<commands>.*?)\n```",
+        readme,
+    )
+    if not match:
+        fail("README.md is missing the Build command block")
+    return [
+        line.strip()
+        for line in match.group("commands").splitlines()
+        if line.strip() and not line.strip().startswith("#")
+    ]
+
+
 def ci_run_commands(ci_workflow: str) -> list[str]:
     commands: list[str] = []
     lines = ci_workflow.splitlines()
@@ -447,6 +461,12 @@ def main() -> None:
         fail(
             "mother-interface-digest.md verification command block drift: "
             f"digest={actual_digest_commands}, expected={expected_digest_commands}"
+        )
+    actual_readme_commands = readme_build_commands(readme)
+    if actual_readme_commands != expected_digest_commands:
+        fail(
+            "README.md Build command block drift: "
+            f"readme={actual_readme_commands}, expected={expected_digest_commands}"
         )
     ci_commands = ci_run_commands(ci_workflow)
     for command in verification_commands:
