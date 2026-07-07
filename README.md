@@ -102,12 +102,20 @@ condition (what would flip the verdict) is documented there.
 ```bash
 # toolchain pinned in lean-toolchain (leanprover/lean4:v4.31.0, mathlib v4.31.0)
 lake exe cache get
-lake build                    # 0 errors, 0 sorry
-./scripts/check_axioms.sh     # only propext / Classical.choice / Quot.sound
+python3 scripts/check_forbidden_tokens.py
+python3 scripts/check_interface_contract.py
+python3 scripts/check_status_json.py
+lake build
+lake env lean test/InterfaceSmoke.lean
+lake env lean test/DirectSourceImportSmoke.lean
+./scripts/check_axioms.sh
+python3 scripts/check_axioms.py
 ```
 
-CI does exactly this on every push, plus a contract-driven source-level
-forbidden-token gate for `sorry`, `admit`, `axiom` and `native_decide`.
+CI does exactly this on every push. The gates include a contract-driven
+source-level forbidden-token check for `sorry`, `admit`, `axiom` and
+`native_decide`, plus an axiom audit restricted to `propext`,
+`Classical.choice` and `Quot.sound`.
 
 ## Roadmap (next general lemmas)
 
