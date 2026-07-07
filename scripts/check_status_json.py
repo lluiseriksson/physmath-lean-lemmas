@@ -157,9 +157,17 @@ def main() -> None:
         "lean_toolchain",
         "mathlib_rev",
         "mathlib_manifest_rev",
+        "source_imports",
         "consumption_rule",
     ):
-        expect_equal(status.get(key), expect_string(contract, key), key)
+        if key == "source_imports":
+            expect_equal(
+                status.get(key),
+                expect_string_list(contract, key),
+                key,
+            )
+        else:
+            expect_equal(status.get(key), expect_string(contract, key), key)
     expect_equal(
         expect_requirement_list(status, "direct_lake_requirements"),
         expect_requirement_list(contract, "direct_lake_requirements"),
