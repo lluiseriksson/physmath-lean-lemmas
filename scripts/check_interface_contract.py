@@ -26,6 +26,14 @@ EXPECTED_DIGEST_SCOPE_MARKERS = (
     "reconstruction",
     "Clay-adjacent",
 )
+EXPECTED_README_SCOPE_MARKERS = (
+    "bookkeeping",
+    "source estimate",
+    "continuum",
+    "mass gap",
+    "reconstruction",
+    "Clay-adjacent",
+)
 
 
 def fail(message: str) -> None:
@@ -411,6 +419,9 @@ def main() -> None:
     for marker in EXPECTED_DIGEST_SCOPE_MARKERS:
         if marker not in digest:
             fail(f"mother-interface-digest.md is missing scope marker: {marker}")
+    for marker in EXPECTED_README_SCOPE_MARKERS:
+        if marker not in readme:
+            fail(f"README.md is missing scope marker: {marker}")
     expect_digest_anchor(
         digest, "satellite", f"Satellite: `{expect_string(contract, 'satellite')}`"
     )
