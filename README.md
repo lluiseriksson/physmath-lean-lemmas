@@ -58,8 +58,9 @@ These are **bookkeeping lemmas**: they collapse three convergence budgets
 into one observable and prove nothing about any *source* estimate. The
 budget hypotheses are exactly the carried inputs of the Appendix-F front.
 Nothing here claims `hRpoly`, a physical activity bound, the continuum
-limit, or any Clay-adjacent statement. Distance to any of those after this
-repo: unchanged.
+limit, mass gap progress, OS/Wightman reconstruction, or any
+Clay-adjacent statement. Distance to any source estimate or any of those
+targets after this repo: unchanged.
 
 ## Position in the Eriksson programme
 
