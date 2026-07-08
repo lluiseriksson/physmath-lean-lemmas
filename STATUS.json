@@ -34,6 +34,10 @@
     "PhysmathLemmas.summable_of_rootedLeafBudget",
     "PhysmathLemmas.norm_tsum_le_of_rootedLeafBudget"
   ],
+  "smoke_tests": [
+    "test/InterfaceSmoke.lean",
+    "test/DirectSourceImportSmoke.lean"
+  ],
   "verification": {
     "ci_workflow": ".github/workflows/ci.yml",
     "commands": [

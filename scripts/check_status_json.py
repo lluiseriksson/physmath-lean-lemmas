@@ -136,6 +136,15 @@ def is_verification_command(command: str) -> bool:
     )
 
 
+def smoke_tests_from_commands(commands: list[str]) -> list[str]:
+    prefix = "lake env lean "
+    return [
+        command[len(prefix) :]
+        for command in commands
+        if command.startswith(prefix) and command[len(prefix) :].startswith("test/")
+    ]
+
+
 def main() -> None:
     status = expect_object(load_json(STATUS_PATH), "STATUS.json")
     contract = expect_object(load_json(CONTRACT_PATH), "docs/interface-contract.json")
@@ -219,6 +228,14 @@ def main() -> None:
         "public_declarations",
     )
 
+    smoke_tests = expect_string_list(status, "smoke_tests")
+    for smoke_test in smoke_tests:
+        smoke_path = ROOT / smoke_test
+        if smoke_path.suffix != ".lean":
+            fail(f"smoke_tests entry is not a Lean file: {smoke_test}")
+        if not smoke_path.is_file():
+            fail(f"smoke_tests entry does not exist: {smoke_test}")
+
     verification = expect_object(status.get("verification"), "verification")
     expect_equal(
         verification.get("ci_workflow"),
@@ -238,6 +255,12 @@ def main() -> None:
         fail(
             "verification command order drift: "
             f"status={verification_commands}, ci={ci_verification_commands}"
+        )
+    expected_smoke_tests = smoke_tests_from_commands(verification_commands)
+    if smoke_tests != expected_smoke_tests:
+        fail(
+            "smoke_tests drift: "
+            f"status={smoke_tests}, verification={expected_smoke_tests}"
         )
     if set(ci_verification_commands) != set(verification_commands):
         missing_from_status = sorted(
